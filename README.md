@@ -1,6 +1,6 @@
 # projeto_BD
 
-Para poder rodar o projeto:
-pip install customtkinter
-pip install tkinter
-pip install oracledb
+#Para poder rodar o projeto:
+<p>pip install customtkinter</p>
+<p>pip install tkinter</p>
+<p>pip install oracledb</p>
