@@ -22,3 +22,8 @@ def cadastrar_usuario_bd(usuario, senha, tipo_usuario):
     finally:
         cursor.close()
         conn.close()
+
+#TODO: param -- username, senha
+#return -- tipo, check (bool se existe ou nao o usuario)
+def validacao_user():
+    pass
