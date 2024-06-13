@@ -55,6 +55,34 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao):
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
     
+    # Incluir/Excluir nação de federação
+    label_incluir_excluir = ctk.CTkLabel(frame_overview_comandante, text="Incluir/Excluir nação de federação", font=("Arial", 18))
+    label_incluir_excluir.pack(pady=10)
+    label_federacao = ctk.CTkLabel(frame_overview_comandante, text="Federação:", font=("Arial", 14))
+    label_federacao.pack(pady=5)
+    entry_federacao = ctk.CTkEntry(frame_overview_comandante, width=400)
+    entry_federacao.pack(pady=5)
+    button_incluir_excluir = ctk.CTkButton(frame_overview_comandante, text="Incluir/Excluir")
+    button_incluir_excluir.pack(pady=10)
+
+    # Criar federação
+    label_criar_federacao_texto = ctk.CTkLabel(frame_overview_comandante, text="Criar Federação", font=("Arial", 18))
+    label_criar_federacao_texto.pack(pady=10)
+    label_criar_federacao = ctk.CTkLabel(frame_overview_comandante, text="Federação:", font=("Arial", 14))
+    label_criar_federacao.pack(pady=5)
+    entry_criar_federacao = ctk.CTkEntry(frame_overview_comandante, width=400)
+    entry_criar_federacao.pack(pady=5)
+    button_criar_federacao = ctk.CTkButton(frame_overview_comandante, text="Criar")
+    button_criar_federacao.pack(pady=10)
+
+    # Inserir dominância
+    label_inserir_dominancia_texto = ctk.CTkLabel(frame_overview_comandante, text="Inserir Dominância", font=("Arial", 18))
+    label_inserir_dominancia_texto.pack(pady=10)
+    label_planeta = ctk.CTkLabel(frame_overview_comandante, text="Planeta:", font=("Arial", 14))
+    label_planeta.pack(pady=5)
+    entry_planeta = ctk.CTkEntry(frame_overview_comandante, width=400)
+    entry_planeta.pack(pady=5)
+    
     botao_voltar = ctk.CTkButton(frame_overview_comandante, text="Voltar", command=mostrar_tela_inicial, width=400, height=40)
     botao_voltar.pack(pady=10)
     return frame_overview_comandante

@@ -55,6 +55,40 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao):
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_cientista, text="Atualizar Comunidade", width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
     
+    # Adicionar Estrela
+    label_adicionar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Adicionar Estrela", font=("Arial", 18))
+    label_adicionar_estrela.pack(pady=10)
+    entry_adicionar_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela.pack(pady=5)
+    label_entry_adicionar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Estrela")
+    label_entry_adicionar_estrela.pack(pady=5)
+    botao_adicionar_estrela = ctk.CTkButton(frame_overview_cientista, text="Adicionar", width=400)
+    botao_adicionar_estrela.pack(pady=5)
+    
+    # Remover Estrela
+    label_remover_estrela = ctk.CTkLabel(frame_overview_cientista, text="Remover Estrela", font=("Arial", 18))
+    label_remover_estrela.pack(pady=10)
+    entry_remover_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_remover_estrela.pack(pady=5)
+    label_entry_remover_estrela = ctk.CTkLabel(frame_overview_cientista, text="Estrela")
+    label_entry_remover_estrela.pack(pady=5)
+    botao_remover_estrela = ctk.CTkButton(frame_overview_cientista, text="Remover", width=400)
+    botao_remover_estrela.pack(pady=5)
+    
+    # Editar Estrela
+    label_editar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Editar Estrela", font=("Arial", 18))
+    label_editar_estrela.pack(pady=10)
+    entry_nome_atual_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_nome_atual_estrela.pack(pady=5)
+    label_nome_atual_estrela = ctk.CTkLabel(frame_overview_cientista, text="Nome Atual da Estrela")
+    label_nome_atual_estrela.pack(pady=5)
+    entry_novo_nome_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_novo_nome_estrela.pack(pady=5)
+    label_novo_nome_estrela = ctk.CTkLabel(frame_overview_cientista, text="Novo Nome da Estrela")
+    label_novo_nome_estrela.pack(pady=5)
+    botao_editar_estrela = ctk.CTkButton(frame_overview_cientista, text="Editar", width=400)
+    botao_editar_estrela.pack(pady=5)
+    
     botao_voltar = ctk.CTkButton(frame_overview_cientista, text="Voltar", command=mostrar_tela_inicial, width=400, height=40)
     botao_voltar.pack(pady=10)
     return frame_overview_cientista
