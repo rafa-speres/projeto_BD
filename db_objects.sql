@@ -54,11 +54,10 @@ BEGIN
     COMMIT;
 END;
 
--- Chamando a Procedure para cadastrar os líderes já existentes na base
+-- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os líderes já existentes na base
 BEGIN
     sp_cadastrar_lider_user;
 END;
-
 
 
 
@@ -80,10 +79,7 @@ BEGIN
     DELETE FROM USERS WHERE id_lider = :OLD.CPI;
 END;
 
--- Inserts para testes do trigger "trg_insert_user_automaticamente"
-INSERT INTO LIDER VALUES ('555.436.559-76',	'Harry', 'COMANDANTE', 'Facilis illo.', 'Illo fugit');
-INSERT INTO LIDER VALUES ('123.436.559-76',	'Julio', 'OFICIAL', 'Facilis illo.', 'Illo fugit');
-INSERT INTO LIDER VALUES ('444.444.444-44',	'Heitor', 'CIENTISTA', 'Facilis illo.', 'Illo fugit');
+
 
 -- Delete para teste do trigger "trg_delete_user_automaticamente"
 --DELETE FROM LIDER WHERE CPI = '555.436.559-76'; --MUTANTE
