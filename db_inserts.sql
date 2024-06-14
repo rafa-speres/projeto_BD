@@ -43,3 +43,33 @@ INSERT INTO LIDER VALUES ('198.519.851-23', 'Marty', 'CIENTISTA', 'Ut quam.', 'A
 
 COMMIT;
 
+
+
+
+
+
+
+--------------------------------------------------------
+-- Inserts para testar o Relatório do Líder de Facção -- 
+--------------------------------------------------------
+
+-- Já haviam sido inseridos:
+-- INSERT INTO LIDER VALUES ('999.999.999-98', 'John', 'OFICIAL', 'Facilis illo.', 'Illo fugit');
+-- INSERT INTO FACCAO VALUES ('faccao_suprema', '999.999.999-98', 'TOTALITARIA', 86);
+
+INSERT INTO COMUNIDADE VALUES ('Odio cum', 'com_empanada', 49); -- Inserindo duas COMUNIDADES com a mesma ESPÉCIE, para demonstrar o agrupamento posteriormente.
+INSERT INTO COMUNIDADE VALUES ('Odio cum', 'com_jugo', 21);
+INSERT INTO COMUNIDADE VALUES ('Ut nam', 'com_fritas', 29);
+
+INSERT INTO PARTICIPA VALUES ('faccao_suprema', 'Odio cum', 'com_empanada');
+INSERT INTO PARTICIPA VALUES ('faccao_suprema', 'Odio cum', 'com_jugo');
+INSERT INTO PARTICIPA VALUES ('faccao_suprema', 'Ut nam', 'com_fritas');
+COMMIT;
+
+-- Para demonstrar o agrupamento por PLANETA
+INSERT INTO PLANETA VALUES ('planeta_papas', 5, 5, NULL);
+
+INSERT INTO HABITACAO VALUES ('planeta_papas', 'Odio cum', 'com_empanada', SYSDATE, NULL);
+INSERT INTO HABITACAO VALUES ('planeta_papas', 'Ut nam', 'com_fritas', SYSDATE, NULL);
+
+
