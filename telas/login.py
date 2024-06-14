@@ -25,7 +25,7 @@ def login_usuario(entry_login_usuario, entry_login_senha, app, mostrar_tela_cien
                     mostrar_tela_cientista(usuario, faccao)
                 else:
                     faccao = 0
-                    mostrar_tela_cientista(usuario)
+                    mostrar_tela_cientista(usuario, faccao)
             elif "COMANDANTE" in tipo_usuario:
                 if result_3:
                     faccao = result_3[0]
