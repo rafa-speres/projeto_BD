@@ -3,11 +3,11 @@
 ---------------------------------------------------
 
 ------------------------------------------------------
--- Scripts para Criação de Objetos na Base de Dados --
+-- Scripts para Criaï¿½ï¿½o de Objetos na Base de Dados --
 ------------------------------------------------------
 
 ------------------------
--- Criação de Tabelas --
+-- Criaï¿½ï¿½o de Tabelas --
 ------------------------
 
 -- Criando a tabela "USERS"
@@ -30,10 +30,10 @@ CREATE TABLE LOG_TABLE (
 
 
 -------------------------
--- Criação de Triggers --
+-- Criaï¿½ï¿½o de Triggers --
 -------------------------
 
--- Trigger para armazenar a senha de um USER utilizando a função MD5 para hash
+-- Trigger para armazenar a senha de um USER utilizando a funï¿½ï¿½o MD5 para hash
 CREATE OR REPLACE TRIGGER trg_hash_password
 BEFORE INSERT OR UPDATE OF password
 ON USERS
@@ -46,7 +46,7 @@ BEGIN
 END;
 
 
--- Trigger para inserir um registro automaticamente na tabela de USERS após uma inserção em LIDER
+-- Trigger para inserir um registro automaticamente na tabela de USERS apï¿½s uma inserï¿½ï¿½o em LIDER
 CREATE OR REPLACE TRIGGER trg_insert_user_automaticamente
 AFTER INSERT ON LIDER
 FOR EACH ROW
@@ -57,10 +57,10 @@ END;
 
 
 ---------------------------
--- Criação de Procedures --
+-- Criaï¿½ï¿½o de Procedures --
 ---------------------------
 
--- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma espécie de carga inicial de USERS)
+-- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma espï¿½cie de carga inicial de USERS)
 CREATE OR REPLACE PROCEDURE sp_cadastrar_lider_user AS
 BEGIN
     FOR i IN (
@@ -75,13 +75,13 @@ BEGIN
     COMMIT;
 END;
 
--- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os líderes já existentes na base
+-- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os lï¿½deres jï¿½ existentes na base
 BEGIN
     sp_cadastrar_lider_user;
 END;
 
 
--- Trigger para excluir um registro automaticamente na tabela de USERS após uma exclusão em LIDER
+-- Trigger para excluir um registro automaticamente na tabela de USERS apï¿½s uma exclusï¿½o em LIDER
 --CREATE OR REPLACE TRIGGER trg_delete_user_automaticamente
 --AFTER DELETE ON LIDER
 --FOR EACH ROW
@@ -96,10 +96,10 @@ END;
 
 
 ------------------------
--- Criação de Pacotes --
+-- Criaï¿½ï¿½o de Pacotes --
 ------------------------
 
--- Criação do pacote de OFICIAL
+-- Criaï¿½ï¿½o do pacote de OFICIAL
 CREATE OR REPLACE PACKAGE pkg_oficial AS
     PROCEDURE get_habitantes_relatorio(p_oficial_id IN CHAR);
 END pkg_oficial;
@@ -151,17 +151,158 @@ CREATE OR REPLACE PACKAGE BODY pkg_oficial AS
 END pkg_oficial;
 
 
--- INTERMINADO (NÃO RETORNA NADA QUE ESTÁ NO LOOP)
+-- INTERMINADO (Nï¿½O RETORNA NADA QUE ESTï¿½ NO LOOP)
 
--- Testando o relatório do OFICIAL:
+-- Testando o relatï¿½rio do OFICIAL:
 BEGIN
     pkg_oficial.get_habitantes_relatorio(p_oficial_id => '999.999.999-98');
 END;
 
 
 
+--CriaÃ§Ã£o do pacote do Lider de facÃ§Ã£o
+CREATE OR REPLACE PACKAGE PacoteLiderFaccao AS
+    -- Procedimento para remover uma facï¿½ï¿½o de uma naï¿½ï¿½o
+    PROCEDURE RemoverFaccaoDeNacao(
+        p_nacao IN VARCHAR2,
+        p_faccao IN VARCHAR2
+    );
+    
+    PROCEDURE AlterarNomeFaccao(
+        p_faccao IN VARCHAR2,
+        p_nome IN VARCHAR2
+    );
+    
+    PROCEDURE IndicarNovoLiderFaccao(
+        p_faccao IN VARCHAR2,
+        p_nome IN VARCHAR2
+    );
+    
+    PROCEDURE CredenciarComunidadesNovas(
+        p_faccao IN VARCHAR2,
+        p_especie IN VARCHAR2,
+        p_comunidade IN VARCHAR2
+    );
+END PacoteLiderFaccao;
 
 
+-- Corpo do pacote
+CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
+    PROCEDURE RemoverFaccaoDeNacao(
+        p_nacao IN VARCHAR2,
+        p_faccao IN VARCHAR2
+    ) IS
+    BEGIN
+        -- Remove a relaï¿½ï¿½o entre a naï¿½ï¿½o e a facï¿½ï¿½o
+        DELETE FROM NACAO_FACCAO
+        WHERE NACAO = p_nacao
+        AND FACCAO = p_faccao;
+
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            RAISE;
+    END RemoverFaccaoDeNacao;
+    
+    PROCEDURE AlterarNomeFaccao(
+        p_faccao IN VARCHAR2,
+        p_nome IN VARCHAR2
+    ) IS
+    BEGIN
+    
+        UPDATE FACCAO
+        SET nome = p_nome
+        WHERE FACCAO.NOME = p_faccao;
+
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            RAISE;
+    END AlterarNomeFaccao;
+    
+    PROCEDURE IndicarNovoLiderFaccao(
+        p_faccao IN VARCHAR2,
+        p_nome IN VARCHAR2
+    ) IS
+    BEGIN
+
+        UPDATE FACCAO
+        SET lider = p_nome
+        WHERE FACCAO.NOME = p_faccao;
+
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            RAISE;
+    END IndicarNovoLiderFaccao;
+    
+     PROCEDURE CredenciarComunidadesNovas(
+        p_faccao IN VARCHAR2,
+        p_especie IN VARCHAR2,
+        p_comunidade IN VARCHAR2
+    ) IS
+    BEGIN
+
+        INSERT INTO VW_LIDER_FACCAO (FACCAO, ESPECIE, NOME_COMUNIDADE)
+        VALUES (p_faccao, p_especie, p_comunidade);
+
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            RAISE;
+    END CredenciarComunidadesNovas;
+END PacoteLiderFaccao;
+
+
+-- View para visualizaï¿½ï¿½o e credenciamento das comunidades por parte do lider
+CREATE OR REPLACE VIEW VW_LIDER_FACCAO AS
+SELECT
+    n.NOME AS NOME_NACAO,
+    p.ID_ASTRO AS NOME_PLANETA,
+    c.NOME AS NOME_COMUNIDADE,
+    c.QTD_HABITANTES,
+    CASE
+        WHEN pa.FACCAO IS NOT NULL THEN 'V'
+        ELSE 'F'
+    END AS CREDENCIADA,
+    f.LIDER,
+    f.NOME AS FACCAO,
+    c.ESPECIE
+FROM
+    NACAO n
+JOIN
+    DOMINANCIA d ON n.NOME = d.NACAO AND d.DATA_FIM IS NULL
+JOIN
+    PLANETA p ON d.PLANETA = p.ID_ASTRO
+JOIN
+    HABITACAO h ON p.ID_ASTRO = h.PLANETA AND h.DATA_FIM IS NULL
+JOIN
+    COMUNIDADE c ON h.ESPECIE = c.ESPECIE AND h.COMUNIDADE = c.NOME
+JOIN
+    NACAO_FACCAO nf ON n.NOME = nf.NACAO
+JOIN
+    FACCAO f ON nf.FACCAO = f.NOME
+LEFT JOIN
+    PARTICIPA pa ON pa.FACCAO = f.NOME AND pa.ESPECIE = c.ESPECIE AND pa.COMUNIDADE = c.NOME;
+
+
+-- Trigger instead-of para manipular as operaï¿½ï¿½es de inserï¿½ï¿½o
+CREATE OR REPLACE TRIGGER trg_vw_lider_faccao_insert
+INSTEAD OF INSERT ON VW_LIDER_FACCAO
+FOR EACH ROW
+BEGIN
+    BEGIN
+        INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE)
+        VALUES (:NEW.FACCAO, :NEW.ESPECIE, :NEW.NOME_COMUNIDADE);
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR(-20001, 'Erro ao inserir dados na tabela PARTICIPA');
+    END;
+END;
 
 
 -- Teste da procedure do oficial
@@ -209,26 +350,26 @@ END;
 
 
 
--- Procedure para gerar relatório de um Líder de Facção
+-- Procedure para gerar relatï¿½rio de um Lï¿½der de Facï¿½ï¿½o
 
--- VERSÃO FUNCIONAL COM AGRUPAMENTO POR ESPÉCIE OU PLANETA (+ CASO DEFAULT)
+-- VERSï¿½O FUNCIONAL COM AGRUPAMENTO POR ESPï¿½CIE OU PLANETA (+ CASO DEFAULT)
 
 CREATE OR REPLACE PROCEDURE relatorio_lider_faccao(p_oficial_id IN CHAR, p_agrupamento IN VARCHAR2 DEFAULT NULL)
 IS
-    -- Variáveis para armazenar informações intermediárias
+    -- Variï¿½veis para armazenar informaï¿½ï¿½es intermediï¿½rias
     v_faccao_nome VARCHAR2(15);
 BEGIN
-    -- Buscar o nome da facção do líder com o CPI informado
+    -- Buscar o nome da facï¿½ï¿½o do lï¿½der com o CPI informado
     SELECT FACCAO.NOME
     INTO v_faccao_nome
     FROM FACCAO
     JOIN LIDER ON FACCAO.LIDER = LIDER.CPI
     WHERE LIDER.CPI = p_oficial_id;
 
-    -- Verificar se a facção foi encontrada
+    -- Verificar se a facï¿½ï¿½o foi encontrada
     IF v_faccao_nome IS NOT NULL THEN
 
-        -- Caso DEFAULT: informações sobre as comunidades da facção do líder
+        -- Caso DEFAULT: informaï¿½ï¿½es sobre as comunidades da facï¿½ï¿½o do lï¿½der
         IF p_agrupamento IS NULL THEN
             FOR rec IN (
                 SELECT C.ESPECIE, C.NOME AS COMUNIDADE, C.QTD_HABITANTES
@@ -236,25 +377,25 @@ BEGIN
                 JOIN PARTICIPA P ON C.ESPECIE = P.ESPECIE AND C.NOME = P.COMUNIDADE
                 WHERE P.FACCAO = v_faccao_nome
             ) LOOP
-                DBMS_OUTPUT.PUT_LINE('Facção: ' || v_faccao_nome);
+                DBMS_OUTPUT.PUT_LINE('Facï¿½ï¿½o: ' || v_faccao_nome);
                 DBMS_OUTPUT.PUT_LINE('Comunidade: ' || rec.COMUNIDADE);
-                DBMS_OUTPUT.PUT_LINE('Espécie: ' || rec.ESPECIE);
+                DBMS_OUTPUT.PUT_LINE('Espï¿½cie: ' || rec.ESPECIE);
                 DBMS_OUTPUT.PUT_LINE('Total de Habitantes: ' || rec.QTD_HABITANTES);
                 DBMS_OUTPUT.PUT_LINE('-------------------------------');
             END LOOP;
 
-        -- Agrupamento por espécie
+        -- Agrupamento por espï¿½cie
         ELSIF p_agrupamento = 'ESPECIE' THEN
             FOR rec IN (
-                SELECT C.ESPECIE, COUNT(C.NOME) AS QTD_COMUNIDADES, SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES -- Aqui somamos a quantidade de habitantes agrupadas por ESPECIE, para as COMUNIDADES participantes da FACCAO do LIDER em questão.
+                SELECT C.ESPECIE, COUNT(C.NOME) AS QTD_COMUNIDADES, SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES -- Aqui somamos a quantidade de habitantes agrupadas por ESPECIE, para as COMUNIDADES participantes da FACCAO do LIDER em questï¿½o.
                 FROM COMUNIDADE C
                 JOIN PARTICIPA P ON C.ESPECIE = P.ESPECIE AND C.NOME = P.COMUNIDADE
                 WHERE P.FACCAO = v_faccao_nome
                 GROUP BY C.ESPECIE
             ) LOOP
-                DBMS_OUTPUT.PUT_LINE('Facção: ' || v_faccao_nome);
+                DBMS_OUTPUT.PUT_LINE('Facï¿½ï¿½o: ' || v_faccao_nome);
                 DBMS_OUTPUT.PUT_LINE('Comunidades: ' || rec.QTD_COMUNIDADES);
-                DBMS_OUTPUT.PUT_LINE('Espécie: ' || rec.ESPECIE);
+                DBMS_OUTPUT.PUT_LINE('Espï¿½cie: ' || rec.ESPECIE);
                 DBMS_OUTPUT.PUT_LINE('Total de Habitantes: ' || rec.TOTAL_HABITANTES);
                 DBMS_OUTPUT.PUT_LINE('-------------------------------');
             END LOOP;
@@ -262,14 +403,14 @@ BEGIN
         -- Agrupamento por planeta
         ELSIF p_agrupamento = 'PLANETA' THEN
             FOR rec IN (
-                SELECT H.PLANETA, COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES -- Aqui somamos a quantidade de habitantes das COMUNIDADES participantes da FACCAO do LIDER em questão.
+                SELECT H.PLANETA, COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES -- Aqui somamos a quantidade de habitantes das COMUNIDADES participantes da FACCAO do LIDER em questï¿½o.
                 FROM COMUNIDADE C
                 JOIN PARTICIPA P ON C.ESPECIE = P.ESPECIE AND C.NOME = P.COMUNIDADE
                 JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
                 WHERE P.FACCAO = v_faccao_nome
                 GROUP BY H.PLANETA
             ) LOOP
-                DBMS_OUTPUT.PUT_LINE('Facção: ' || v_faccao_nome);
+                DBMS_OUTPUT.PUT_LINE('Facï¿½ï¿½o: ' || v_faccao_nome);
                 DBMS_OUTPUT.PUT_LINE('Comunidades: ' || rec.QTD_COMUNIDADES);
                 DBMS_OUTPUT.PUT_LINE('Planeta: ' || rec.PLANETA);
                 DBMS_OUTPUT.PUT_LINE('Total de Habitantes: ' || rec.TOTAL_HABITANTES);
@@ -277,15 +418,15 @@ BEGIN
             END LOOP;
 
         ELSE
-            DBMS_OUTPUT.PUT_LINE('Agrupamento inválido. Use "ESPECIE" ou "PLANETA" como parâmetro.');
+            DBMS_OUTPUT.PUT_LINE('Agrupamento invï¿½lido. Use "ESPECIE" ou "PLANETA" como parï¿½metro.');
         END IF;
 
     ELSE
-        DBMS_OUTPUT.PUT_LINE('Nenhuma facção encontrada para o líder com CPI: ' || p_oficial_id);
+        DBMS_OUTPUT.PUT_LINE('Nenhuma facï¿½ï¿½o encontrada para o lï¿½der com CPI: ' || p_oficial_id);
     END IF;
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('Nenhum líder encontrado com o CPI: ' || p_oficial_id);
+        DBMS_OUTPUT.PUT_LINE('Nenhum lï¿½der encontrado com o CPI: ' || p_oficial_id);
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
 END;
@@ -313,7 +454,7 @@ END;
 
 -- relatorio lider faccao
 
--- View com todas as informações necessárias
+-- View com todas as informaï¿½ï¿½es necessï¿½rias
 --CREATE OR REPLACE VIEW V_COMUNIDADES AS
 --SELECT
 --    F.NOME AS FACCAO,
@@ -356,7 +497,7 @@ END;
 --        WHEN 'sistema' THEN
 --            v_sql := v_sql || 'SISTEMA, ';
 --        ELSE
---            RAISE_APPLICATION_ERROR(-20001, 'Parâmetro de agrupamento inválido');
+--            RAISE_APPLICATION_ERROR(-20001, 'Parï¿½metro de agrupamento invï¿½lido');
 --    END CASE;
 --
 --    v_sql := v_sql || 'COUNT(COMUNIDADE) AS QTD_COMUNIDADES, SUM(QTD_HABITANTES) AS TOTAL_HABITANTES ' ||
