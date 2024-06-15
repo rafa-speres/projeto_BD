@@ -1,9 +1,10 @@
 import customtkinter as ctk
 
-def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao):
-    frame_overview_cientista = ctk.CTkScrollableFrame(app, width=1600, height=900)
-    label_cientista = ctk.CTkLabel(frame_overview_cientista, text="Bem-vindo Cientista", font=("Arial", 24))
-    label_cientista.pack(pady=20)
+def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider):
+    tipo_usuario = "cientista"
+    frame_overview_cientista = ctk.CTkScrollableFrame(app, width=1400, height=800)
+    label_oficial = ctk.CTkLabel(frame_overview_cientista, text=f"Bem-vindo Cientista {usuario}", font=("Arial", 20))
+    label_oficial.pack(pady=10)
     
     if(faccao != 0):   
         label_operacao_a1 = ctk.CTkLabel(frame_overview_cientista, text="Alterar nome da Facção", font=("Arial", 18))
@@ -54,6 +55,10 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao):
         # Botão para atualizar dados da comunidade
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_cientista, text="Atualizar Comunidade", width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
+        
+        # Botão para ver relatórios de lider
+        botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_cientista, text="Ver Relatórios de Líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)
+        botao_ver_relatorios_lider.pack(pady=10)
     
     # Adicionar Estrela
     label_adicionar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Adicionar Estrela", font=("Arial", 18))
@@ -89,6 +94,11 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao):
     botao_editar_estrela = ctk.CTkButton(frame_overview_cientista, text="Editar", width=400)
     botao_editar_estrela.pack(pady=5)
     
-    botao_voltar = ctk.CTkButton(frame_overview_cientista, text="Voltar", command=mostrar_tela_inicial, width=400, height=40)
-    botao_voltar.pack(pady=10)
+    # Botão para ver relatórios
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_cientista, text="Ver Relatórios", command=lambda: mostrar_relatorio_cientista(usuario, faccao), width=400, height=40)
+    botao_ver_relatorios.pack(pady=10)
+
+    # Botão para voltar à tela de login
+    botao_voltar_login = ctk.CTkButton(frame_overview_cientista, text="Voltar à Tela de Login", command=mostrar_tela_inicial, width=400, height=40)
+    botao_voltar_login.pack(pady=10)
     return frame_overview_cientista

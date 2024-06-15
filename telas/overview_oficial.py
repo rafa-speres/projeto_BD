@@ -1,7 +1,8 @@
 import customtkinter as ctk
 
-def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao):
-    frame_overview_oficial = ctk.CTkScrollableFrame(app, width=1600, height=900)
+def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider):
+    tipo_usuario = "oficial"
+    frame_overview_oficial = ctk.CTkScrollableFrame(app, width=1400, height=800)
     # Bem-vindo Oficial
     label_oficial = ctk.CTkLabel(frame_overview_oficial, text=f"Bem-vindo Oficial {usuario}", font=("Arial", 20))
     label_oficial.pack(pady=10)
@@ -55,9 +56,13 @@ def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao):
         # Botão para atualizar dados da comunidade
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Atualizar Comunidade", width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
+        
+        # Botão para ver relatórios lider
+        botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios de Líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)
+        botao_ver_relatorios_lider.pack(pady=10)
 
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios", width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios", command=lambda: mostrar_relatorio_oficial(usuario, faccao), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login
