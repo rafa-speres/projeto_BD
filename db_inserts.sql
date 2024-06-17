@@ -57,7 +57,9 @@ COMMIT;
 -- INSERT INTO LIDER VALUES ('999.999.999-98', 'John', 'OFICIAL', 'Facilis illo.', 'Illo fugit');
 -- INSERT INTO FACCAO VALUES ('faccao_suprema', '999.999.999-98', 'TOTALITARIA', 86);
 
-INSERT INTO COMUNIDADE VALUES ('Odio cum', 'com_empanada', 49); -- Inserindo duas COMUNIDADES com a mesma ESPÉCIE, para demonstrar o agrupamento posteriormente.
+
+ -- Inserindo duas COMUNIDADES com a mesma ESPÉCIE, para demonstrar o agrupamento posteriormente.
+INSERT INTO COMUNIDADE VALUES ('Odio cum', 'com_empanada', 49);
 INSERT INTO COMUNIDADE VALUES ('Odio cum', 'com_jugo', 21);
 INSERT INTO COMUNIDADE VALUES ('Ut nam', 'com_fritas', 29);
 
@@ -68,8 +70,29 @@ COMMIT;
 
 -- Para demonstrar o agrupamento por PLANETA
 INSERT INTO PLANETA VALUES ('planeta_papas', 5, 5, NULL);
+INSERT INTO PLANETA VALUES ('planeta_burger', 11, 12, NULL);
 
 INSERT INTO HABITACAO VALUES ('planeta_papas', 'Odio cum', 'com_empanada', SYSDATE, NULL);
 INSERT INTO HABITACAO VALUES ('planeta_papas', 'Ut nam', 'com_fritas', SYSDATE, NULL);
+INSERT INTO HABITACAO VALUES ('planeta_burger', 'Odio cum', 'com_jugo', SYSDATE, NULL);
+COMMIT;
+
+-- Para demonstrar o agrupamento por SISTEMA
+--INSERT INTO ESTRELA VALUES('GJ 3837', 'Xuange', 'A0sh', 17,076544728138742, -17,435524, -11,802923, 21,870286');
+--INSERT INTO ESTRELA VALUES('Gl 771A', 'Alshain', 'G8IVvar', 5,360434578161428, 6,563854, -11,925647, 1,528534');
+
+INSERT INTO ORBITA_PLANETA VALUES('planeta_papas', 'GJ 3837', 20, 30, NULL);
+INSERT INTO ORBITA_PLANETA VALUES('planeta_burger', 'Gl 771A', 50, 60, NULL);
+
+INSERT INTO SISTEMA VALUES('GJ 3837', 'Sistema  Andrômeda');
+INSERT INTO SISTEMA VALUES('Gl 771A', 'Sistema  Nutri');
+COMMIT;
 
 
+-- Para demonstrar o agrupamento por NACAO
+--INSERT INTO NACAO VALUES('Facilis illo.', 2, 'Qui sed ut.'); -- Registro já incluso na carga inicial de dados
+INSERT INTO NACAO VALUES('nacao_do_bem', 1, NULL);
+
+INSERT INTO DOMINANCIA VALUES('planeta_papas', 'nacao_do_bem', SYSDATE, NULL);
+INSERT INTO DOMINANCIA VALUES('planeta_burger', 'Facilis illo.', SYSDATE, NULL);
+COMMIT;
