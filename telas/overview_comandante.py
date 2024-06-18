@@ -9,7 +9,7 @@ def alterar_nome_faccao(faccao, nova_faccao):
     try:
         cursor.execute(f"""
             BEGIN
-                PacoteLiderFaccao.AlterarNomeFaccao('{faccao}', '{nova_faccao}');
+                PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
             END;
         """)
         conn.commit()
@@ -25,10 +25,11 @@ def alterar_lider(faccao, novo_lider):
     novo_lider = novo_lider.get()
     conn = conectar_bd()
     cursor = conn.cursor()
+    check = 0
     try:
         cursor.execute(f"""
             BEGIN
-                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao}', '{novo_lider}');
+                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
             END;
         """)
         conn.commit()
@@ -36,10 +37,20 @@ def alterar_lider(faccao, novo_lider):
     except Exception as e:
         conn.rollback()
         messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+        check = 1
     finally:
         cursor.close()
         conn.close()
-        
+        if check == 0:
+            faccao[0] = 0
+
+def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante):
+    alterar_lider(faccao,novo_lider)
+    for widget in app.winfo_children():
+        widget.pack_forget()
+    criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante)
+
+
 def credenciar_comunidades(faccao, especie, comunidade):
     especie = especie.get()
     comunidade = comunidade.get()
@@ -48,27 +59,32 @@ def credenciar_comunidades(faccao, especie, comunidade):
     try:
         cursor.execute(f"""
             BEGIN
-                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao}', '{especie}', '{comunidade}');
+                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
             END;
         """)
         conn.commit()
         messagebox.showinfo("Sucesso", "Comunidade credenciada!")
     except Exception as e:
         conn.rollback()
-        messagebox.showerror("Erro", f"Falha ou credenciar {e}")
+        messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
     finally:
         cursor.close()
         conn.close()
 
 def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante):
+    #faccao = [faccao]
+    if not isinstance(faccao, list):
+        faccao = [faccao]
     tipo_usuario = "comandante"
     frame_overview_comandante = ctk.CTkScrollableFrame(app, width=1400, height=800)
+    frame_overview_comandante.pack()
+
     label_oficial = ctk.CTkLabel(frame_overview_comandante, text=f"Bem-vindo Comandante {usuario}", font=("Arial", 20))
     label_oficial.pack(pady=10)
     
-    if(faccao != 0):   
+    if faccao[0] != 0:
         label_operacao_a1 = ctk.CTkLabel(frame_overview_comandante, text="Alterar nome da Facção", font=("Arial", 18))
-        label_operacao_a1 .pack(pady=10)
+        label_operacao_a1.pack(pady=10)
         
         # Nome novo da facção
         label_nome_novo = ctk.CTkLabel(frame_overview_comandante, text="Novo nome para facção")
@@ -81,7 +97,8 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         botao_atualizar_faccao.pack(pady=10)
 
         label_operacao_a2 = ctk.CTkLabel(frame_overview_comandante, text="Indicar novo líder", font=("Arial", 18))
-        label_operacao_a2 .pack(pady=10)
+        label_operacao_a2.pack(pady=10)
+        
         # Novo líder
         label_novo_lider = ctk.CTkLabel(frame_overview_comandante, text="Novo Líder")
         label_novo_lider.pack(pady=(10, 0))
@@ -89,11 +106,11 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         entrada_novo_lider.pack(pady=(0, 10))
 
         # Botão para atualizar novo líder
-        botao_atualizar_lider = ctk.CTkButton(frame_overview_comandante, text="Atualizar Líder", command=lambda: alterar_lider(faccao, entrada_novo_lider), width=400, height=40)
+        botao_atualizar_lider = ctk.CTkButton(frame_overview_comandante, text="Atualizar Líder", command=lambda: atualizar_pagina(faccao, entrada_novo_lider, app, mostrar_tela_inicial, usuario, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante), width=400, height=40)
         botao_atualizar_lider.pack(pady=10)
 
         label_operacao_a3 = ctk.CTkLabel(frame_overview_comandante, text="Credenciar comunidades novas", font=("Arial", 18))
-        label_operacao_a3 .pack(pady=10)
+        label_operacao_a3.pack(pady=10)
 
         # Espécie
         label_especie = ctk.CTkLabel(frame_overview_comandante, text="Espécie")
@@ -108,46 +125,19 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         entrada_nome_comunidade.pack(pady=(0, 10))
 
         # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", command=lambda:  credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade),width=400, height=40)
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
         
-        # Botão para ver relatórios de lider
+        # Botão para ver relatórios de líder
         botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios de líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)
         botao_ver_relatorios_lider.pack(pady=10)
     
-    # Incluir/Excluir nação de federação
-    label_incluir_excluir = ctk.CTkLabel(frame_overview_comandante, text="Incluir/Excluir nação de federação", font=("Arial", 18))
-    label_incluir_excluir.pack(pady=10)
-    label_federacao = ctk.CTkLabel(frame_overview_comandante, text="Federação:", font=("Arial", 14))
-    label_federacao.pack(pady=5)
-    entry_federacao = ctk.CTkEntry(frame_overview_comandante, width=400)
-    entry_federacao.pack(pady=5)
-    button_incluir_excluir = ctk.CTkButton(frame_overview_comandante, text="Incluir/Excluir")
-    button_incluir_excluir.pack(pady=10)
-
-    # Criar federação
-    label_criar_federacao_texto = ctk.CTkLabel(frame_overview_comandante, text="Criar Federação", font=("Arial", 18))
-    label_criar_federacao_texto.pack(pady=10)
-    label_criar_federacao = ctk.CTkLabel(frame_overview_comandante, text="Federação:", font=("Arial", 14))
-    label_criar_federacao.pack(pady=5)
-    entry_criar_federacao = ctk.CTkEntry(frame_overview_comandante, width=400)
-    entry_criar_federacao.pack(pady=5)
-    button_criar_federacao = ctk.CTkButton(frame_overview_comandante, text="Criar")
-    button_criar_federacao.pack(pady=10)
-
-    # Inserir dominância
-    label_inserir_dominancia_texto = ctk.CTkLabel(frame_overview_comandante, text="Inserir Dominância", font=("Arial", 18))
-    label_inserir_dominancia_texto.pack(pady=10)
-    label_planeta = ctk.CTkLabel(frame_overview_comandante, text="Planeta:", font=("Arial", 14))
-    label_planeta.pack(pady=5)
-    entry_planeta = ctk.CTkEntry(frame_overview_comandante, width=400)
-    entry_planeta.pack(pady=5)
-    
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao), width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao[0]), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login
     botao_voltar_login = ctk.CTkButton(frame_overview_comandante, text="Voltar à Tela de Login", command=mostrar_tela_inicial, width=400, height=40)
     botao_voltar_login.pack(pady=10)
+
     return frame_overview_comandante
