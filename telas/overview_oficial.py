@@ -52,10 +52,10 @@ def credenciar_comunidades(faccao, especie, comunidade):
             END;
         """)
         conn.commit()
-        messagebox.showinfo("Sucesso", "Lider alterado!")
+        messagebox.showinfo("Sucesso", "Comunidade credenciada!")
     except Exception as e:
         conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+        messagebox.showerror("Erro", f"Falha ou credenciar {e}")
     finally:
         cursor.close()
         conn.close()
