@@ -1,6 +1,47 @@
 import customtkinter as ctk
+from tkinter import messagebox
+from database import conectar_bd
 
-def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider):
+def alterar_nome_faccao(faccao, nova_faccao):
+    nova_faccao = nova_faccao.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PacoteLiderFaccao.AlterarNomeFaccao('{faccao}', '{nova_faccao}');
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Nome de facção alterado!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+        
+def alterar_lider(faccao, novo_lider):
+    novo_lider = novo_lider.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao}', '{novo_lider}');
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Lider alterado!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+        
+
+def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider, mostrar_tela_cientista):
     tipo_usuario = "cientista"
     frame_overview_cientista = ctk.CTkScrollableFrame(app, width=1400, height=800)
     label_oficial = ctk.CTkLabel(frame_overview_cientista, text=f"Bem-vindo Cientista {usuario}", font=("Arial", 20))
@@ -17,7 +58,7 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar
         entrada_nome_novo.pack(pady=(0, 10))
 
         # Botão para atualizar nome da facção
-        botao_atualizar_faccao = ctk.CTkButton(frame_overview_cientista, text="Atualizar Facção", width=400, height=40)
+        botao_atualizar_faccao = ctk.CTkButton(frame_overview_cientista, text="Atualizar Facção", command=lambda: alterar_nome_faccao(faccao, entrada_nome_novo), width=400, height=40)
         botao_atualizar_faccao.pack(pady=10)
 
         label_operacao_a2 = ctk.CTkLabel(frame_overview_cientista, text="Indicar novo líder", font=("Arial", 18))
@@ -29,7 +70,7 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar
         entrada_novo_lider.pack(pady=(0, 10))
 
         # Botão para atualizar novo líder
-        botao_atualizar_lider = ctk.CTkButton(frame_overview_cientista, text="Atualizar Líder", width=400, height=40)
+        botao_atualizar_lider = ctk.CTkButton(frame_overview_cientista, text="Atualizar Líder", command=lambda: alterar_lider(faccao, entrada_novo_lider), width=400, height=40)
         botao_atualizar_lider.pack(pady=10)
 
         label_operacao_a3 = ctk.CTkLabel(frame_overview_cientista, text="Credenciar comunidades novas", font=("Arial", 18))

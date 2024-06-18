@@ -21,19 +21,19 @@ def mostrar_tela_login():
 # Função para mostrar a tela de cientista
 def mostrar_tela_cientista(usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider):
     esconder_todas_as_telas()
-    frame_tela_cientista = criar_overview_cientista(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider)
+    frame_tela_cientista = criar_overview_cientista(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider, mostrar_tela_cientista)
     frame_tela_cientista.pack(pady=20)
 
 # Função para mostrar a tela de comandante
 def mostrar_tela_comandante(usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider):
     esconder_todas_as_telas()
-    frame_tela_comandante = criar_overview_comandante(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider)
+    frame_tela_comandante = criar_overview_comandante(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante)
     frame_tela_comandante.pack(pady=20)
 
 # Função para mostrar a tela de oficial
 def mostrar_tela_oficial(usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider):
     esconder_todas_as_telas()
-    frame_tela_oficial = criar_overview_oficial(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider)
+    frame_tela_oficial = criar_overview_oficial(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial)
     frame_tela_oficial.pack(pady=20)
     
 def mostrar_relatorio_cientista(usuario,faccao, tipo_usuario):

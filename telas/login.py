@@ -39,7 +39,7 @@ def login_usuario(entry_login_usuario, entry_login_senha, app, mostrar_tela_cien
                     mostrar_tela_oficial(usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider)
                 else:
                     faccao = 0
-                    mostrar_tela_oficial(usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider)
+                    mostrar_tela_oficial(usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider,)
         else:
             messagebox.showerror("Erro", "Usuário ou senha inválidos.")
         cursor.close()

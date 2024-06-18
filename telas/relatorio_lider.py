@@ -22,6 +22,8 @@ def relatorio_comunidades(usuario, frame):
                 for col_num, cell_data in enumerate(row_data):
                     cell = ctk.CTkLabel(subframe, text=cell_data, font=("Arial", 12))
                     cell.grid(row=row_num, column=col_num, padx=5, pady=5)
+    cursor.close()
+    conn.close()
 
 def relatorio_comunidades_por_especie(usuario, frame):
     if usuario:
@@ -44,6 +46,9 @@ def relatorio_comunidades_por_especie(usuario, frame):
                 for col_num, cell_data in enumerate(row_data):
                     cell = ctk.CTkLabel(subframe, text=cell_data, font=("Arial", 12))
                     cell.grid(row=row_num, column=col_num, padx=5, pady=5)
+    
+    cursor.close()
+    conn.close()
 
 def relatorio_comunidades_por_planeta(usuario, frame):
     if usuario:
@@ -67,6 +72,9 @@ def relatorio_comunidades_por_planeta(usuario, frame):
                     cell = ctk.CTkLabel(subframe, text=cell_data, font=("Arial", 12))
                     cell.grid(row=row_num, column=col_num, padx=5, pady=5)
                     
+    cursor.close()
+    conn.close()
+                    
 def relatorio_comunidades_por_sistema(usuario, frame):
     if usuario:
         conn = conectar_bd()
@@ -89,6 +97,9 @@ def relatorio_comunidades_por_sistema(usuario, frame):
                     cell = ctk.CTkLabel(subframe, text=cell_data, font=("Arial", 12))
                     cell.grid(row=row_num, column=col_num, padx=5, pady=5)
                     
+    cursor.close()
+    conn.close()
+                    
 def relatorio_comunidades_por_nacao(usuario, frame):
     if usuario:
         conn = conectar_bd()
@@ -110,6 +121,9 @@ def relatorio_comunidades_por_nacao(usuario, frame):
                 for col_num, cell_data in enumerate(row_data):
                     cell = ctk.CTkLabel(subframe, text=cell_data, font=("Arial", 12))
                     cell.grid(row=row_num, column=col_num, padx=5, pady=5)
+    
+    cursor.close()
+    conn.close()
 
 def criar_relatorio_lider(app, mostrar_tela_inicial, mostrar_tela_cientista, mostrar_tela_comandante, mostrar_tela_oficial, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_comandante, mostrar_relatorio_oficial, mostrar_relatorio_lider, tipo_usuario):
     
