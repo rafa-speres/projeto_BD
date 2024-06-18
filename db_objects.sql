@@ -193,7 +193,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         p_faccao IN VARCHAR2
     ) IS
     BEGIN
-        -- Remove a rela??o entre a nação e a facção
+        -- Remove a rela??o entre a naï¿½ï¿½o e a facï¿½ï¿½o
         DELETE FROM NACAO_FACCAO
         WHERE NACAO = p_nacao
         AND FACCAO = p_faccao;
@@ -201,7 +201,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
             RAISE;
     END RemoverFaccaoDeNacao;
 
@@ -218,7 +218,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
             RAISE;
     END AlterarNomeFaccao;
 
@@ -235,7 +235,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
             RAISE;
     END IndicarNovoLiderFaccao;
 
@@ -315,7 +315,7 @@ BEGIN
             NACAO_FACCAO nf ON n.NOME = nf.NACAO
         JOIN
             FACCAO f ON nf.FACCAO = f.NOME
-        WHERE f.NOME = :NEW.FACCAO AND c.NOME = :NEW.NOME_COMUNIDADE;
+        WHERE f.NOME = :NEW.FACCAO AND c.NOME = :NEW.NOME_COMUNIDADE AND c.Especie = :NEW.ESPECIE;
 
         -- If the faccao and comunidade exist, insert into PARTICIPA
         INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE)
