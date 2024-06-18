@@ -193,7 +193,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         p_faccao IN VARCHAR2
     ) IS
     BEGIN
-        -- Remove a rela??o entre a na??o e a fac??o
+        -- Remove a rela??o entre a nação e a facção
         DELETE FROM NACAO_FACCAO
         WHERE NACAO = p_nacao
         AND FACCAO = p_faccao;
@@ -201,7 +201,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover fac??o da na??o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
             RAISE;
     END RemoverFaccaoDeNacao;
 
@@ -218,7 +218,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover fac??o da na??o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
             RAISE;
     END AlterarNomeFaccao;
 
@@ -235,7 +235,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover fac??o da na??o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
             RAISE;
     END IndicarNovoLiderFaccao;
 
@@ -366,7 +366,7 @@ CREATE OR REPLACE TYPE tp_relatorio_tabela_lider_faccao AS TABLE OF tp_relatorio
 
 -- Função para gerar o relatório do LIDER de FACCAO
 CREATE OR REPLACE FUNCTION relatorio_lider_faccao(
-    p_oficial_id IN CHAR,
+    p_lider_id IN CHAR,
     p_agrupamento IN VARCHAR2 DEFAULT NULL
 ) RETURN tp_relatorio_tabela_lider_faccao PIPELINED
 IS
@@ -377,7 +377,7 @@ BEGIN
     INTO v_faccao_nome
     FROM FACCAO
     JOIN LIDER ON FACCAO.LIDER = LIDER.CPI
-    WHERE LIDER.CPI = p_oficial_id;
+    WHERE LIDER.CPI = p_lider_id;
 
     -- Verificando se a FACCAO foi encontrada
     IF v_faccao_nome IS NOT NULL THEN
@@ -465,17 +465,17 @@ END;
 
 -- Testes de chamada da função:
 -- Caso DEFAULT
-SELECT agrupamento AS COMUNIDADE, especie, total_habitantes FROM TABLE(relatorio_lider_faccao(p_oficial_id => '999.999.999-98'));
+SELECT agrupamento AS COMUNIDADE, especie, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98'));
 
 -- Agrupamento por ESPECIE
-SELECT agrupamento AS ESPECIE, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_oficial_id => '999.999.999-98', p_agrupamento => 'ESPECIE'));
+SELECT agrupamento AS ESPECIE, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'ESPECIE'));
 
 -- Agrupamento por PLANETA
-SELECT agrupamento AS PLANETA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_oficial_id => '999.999.999-98', p_agrupamento => 'PLANETA'));
+SELECT agrupamento AS PLANETA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'PLANETA'));
 
 -- Agrupamento por SISTEMA
-SELECT agrupamento AS SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_oficial_id => '999.999.999-98', p_agrupamento => 'SISTEMA'));
+SELECT agrupamento AS SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'SISTEMA'));
 
 -- Agrupamento por NACAO
-SELECT agrupamento AS NACAO, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_oficial_id => '999.999.999-98', p_agrupamento => 'NACAO'));
+SELECT agrupamento AS NACAO, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'NACAO'));
 
