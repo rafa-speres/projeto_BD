@@ -43,10 +43,12 @@ INSERT INTO LIDER VALUES ('198.519.851-23', 'Marty', 'CIENTISTA', 'Ut quam.', 'A
 
 COMMIT;
 
+---------------------------------------------------------------
+-- Inserts para testar as Funcionalidades do Líder de Facção -- 
+---------------------------------------------------------------
 
-
-
-
+INSERT INTO FACCAO VALUES ('Faccao_Claquete', '888.482.444-10', 'PROGRESSITA', 0);
+COMMIT;
 
 
 --------------------------------------------------------
