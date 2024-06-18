@@ -40,7 +40,25 @@ def alterar_lider(faccao, novo_lider):
         cursor.close()
         conn.close()
         
-
+def credenciar_comunidades(faccao, especie, comunidade):
+    especie = especie.get()
+    comunidade = comunidade.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao}', '{especie}', '{comunidade}');
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Lider alterado!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante):
     tipo_usuario = "comandante"
@@ -76,11 +94,6 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
 
         label_operacao_a3 = ctk.CTkLabel(frame_overview_comandante, text="Credenciar comunidades novas", font=("Arial", 18))
         label_operacao_a3 .pack(pady=10)
-        # Facção
-        label_faccao = ctk.CTkLabel(frame_overview_comandante, text="Facção")
-        label_faccao.pack(pady=(10, 0))
-        entrada_faccao = ctk.CTkEntry(frame_overview_comandante)
-        entrada_faccao.pack(pady=(0, 10))
 
         # Espécie
         label_especie = ctk.CTkLabel(frame_overview_comandante, text="Espécie")
@@ -95,7 +108,7 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         entrada_nome_comunidade.pack(pady=(0, 10))
 
         # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", width=400, height=40)
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", command=lambda:  credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade),width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
         
         # Botão para ver relatórios de lider
