@@ -62,7 +62,7 @@ def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_r
         botao_ver_relatorios_lider.pack(pady=10)
 
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios", command=lambda: mostrar_relatorio_oficial(usuario, faccao), width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios", command=lambda: mostrar_relatorio_oficial(usuario, faccao, tipo_usuario), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login
