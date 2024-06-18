@@ -505,3 +505,235 @@ SELECT agrupamento AS SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(rela
 -- Agrupamento por NACAO
 SELECT agrupamento AS NACAO, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'NACAO'));
 
+
+
+
+
+-- Criando o pacote de Cientistas
+CREATE OR REPLACE PACKAGE PACOTE_CIENTISTA AS
+  PROCEDURE criar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  );
+
+  FUNCTION ler_estrela(
+    p_id_estrela IN VARCHAR2
+  ) RETURN SYS_REFCURSOR;
+
+  PROCEDURE atualizar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  );
+
+  PROCEDURE deletar_estrela(
+    p_id_estrela IN VARCHAR2
+  );
+
+
+-- relativo ao relatório
+  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED;
+  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED;
+  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED;
+
+END PACOTE_CIENTISTA;
+
+
+-- Corpo do pacote Cientista
+CREATE OR REPLACE PACKAGE BODY PACOTE_CIENTISTA AS
+
+  PROCEDURE criar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  ) IS
+  BEGIN
+    BEGIN
+      INSERT INTO ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z)
+      VALUES (p_id_estrela, p_nome, p_classificacao, p_massa, p_x, p_y, p_z);
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: J� existe uma estrela com o ID ou coordenadas fornecidas.');
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END criar_estrela;
+
+  FUNCTION ler_estrela(
+    p_id_estrela IN VARCHAR2
+  ) RETURN SYS_REFCURSOR IS
+    v_estrela SYS_REFCURSOR;
+  BEGIN
+    OPEN v_estrela FOR
+    SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
+    FROM ESTRELA
+    WHERE ID_ESTRELA = p_id_estrela;
+    RETURN v_estrela;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
+      RETURN NULL;
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+      RETURN NULL;
+  END ler_estrela;
+
+  PROCEDURE atualizar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  ) IS
+  BEGIN
+    BEGIN
+      UPDATE ESTRELA
+      SET NOME = p_nome,
+          CLASSIFICACAO = p_classificacao,
+          MASSA = p_massa,
+          X = p_x,
+          Y = p_y,
+          Z = p_z
+      WHERE ID_ESTRELA = p_id_estrela;
+      
+      IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
+      END IF;
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: As coordenadas fornecidas j� est�o sendo utilizadas.');
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END atualizar_estrela;
+
+  PROCEDURE deletar_estrela(
+    p_id_estrela IN VARCHAR2
+  ) IS
+  BEGIN
+    BEGIN
+      DELETE FROM ESTRELA
+      WHERE ID_ESTRELA = p_id_estrela;
+      
+      IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END deletar_estrela;
+
+  -- Relativo ao relatório -------------------------------------------------------------
+
+  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
+      FROM ESTRELA
+      WHERE MASSA IS NULL
+    ) LOOP
+      PIPE ROW(tp_estrela(
+        rec.ID_ESTRELA,
+        rec.NOME,
+        rec.CLASSIFICACAO,
+        rec.MASSA,
+        rec.X,
+        rec.Y,
+        rec.Z
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
+      RAISE;
+  END obterEstrelas;
+  
+  
+  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ID_ASTRO, RAIO, CLASSIFICACAO, MASSA
+      FROM Planeta
+      WHERE MASSA IS NULL
+    ) LOOP
+      PIPE ROW(tp_planeta(
+        rec.ID_ASTRO,
+        rec.RAIO,
+        rec.CLASSIFICACAO,
+        rec.MASSA
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter planetas: ' || SQLERRM);
+      RAISE;
+  END obterPlanetas;
+  
+  
+  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ESTRELA, NOME
+      FROM SISTEMA
+      WHERE NOME IS NULL
+    ) LOOP
+      PIPE ROW(tp_sistema(
+        rec.ESTRELA,
+        rec.NOME
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter sistemas: ' || SQLERRM);
+      RAISE;
+  END obterSistemas;
+
+END PACOTE_CIENTISTA;
+
+
+
+
+CREATE OR REPLACE TYPE tp_estrela AS OBJECT (
+    id_estrela VARCHAR2(50),
+    nome VARCHAR2(100),
+    classificacao VARCHAR2(50),
+    massa NUMBER,
+    x NUMBER,
+    y NUMBER,
+    z NUMBER
+);
+
+CREATE OR REPLACE TYPE tp_tabela_estrela AS TABLE OF tp_estrela;
+
+
+CREATE OR REPLACE TYPE tp_planeta AS OBJECT (
+    id_astro VARCHAR2(50),
+    raio NUMBER,
+    classificacao VARCHAR2(50),
+    massa NUMBER
+);
+
+CREATE OR REPLACE TYPE tp_tabela_planeta AS TABLE OF tp_planeta;
+  
+CREATE OR REPLACE TYPE tp_sistema AS OBJECT (
+    estrela VARCHAR2(100),
+    nome VARCHAR2(100)
+);
+
+CREATE OR REPLACE TYPE tp_tabela_sistema AS TABLE OF tp_sistema;
