@@ -3,11 +3,11 @@
 ---------------------------------------------------
 
 ------------------------------------------------------
--- Scripts para Criação de Objetos na Base de Dados --
+-- Scripts para Criaï¿½ï¿½o de Objetos na Base de Dados --
 ------------------------------------------------------
 
 ------------------------
--- Criação de Tabelas --
+-- Criaï¿½ï¿½o de Tabelas --
 ------------------------
 
 -- Criando a tabela "USERS"
@@ -30,10 +30,10 @@ CREATE TABLE LOG_TABLE (
 
 
 -------------------------
--- Criação de Triggers --
+-- Criaï¿½ï¿½o de Triggers --
 -------------------------
 
--- Trigger para armazenar a senha de um USER utilizando a função MD5 para hash
+-- Trigger para armazenar a senha de um USER utilizando a funï¿½ï¿½o MD5 para hash
 CREATE OR REPLACE TRIGGER trg_hash_password
 BEFORE INSERT OR UPDATE OF password
 ON USERS
@@ -46,7 +46,7 @@ BEGIN
 END;
 
 
--- Trigger para inserir um registro automaticamente na tabela de USERS após uma inserção em LIDER
+-- Trigger para inserir um registro automaticamente na tabela de USERS apï¿½s uma inserï¿½ï¿½o em LIDER
 CREATE OR REPLACE TRIGGER trg_insert_user_automaticamente
 AFTER INSERT ON LIDER
 FOR EACH ROW
@@ -57,10 +57,10 @@ END;
 
 
 ---------------------------
--- Criação de Procedures --
+-- Criaï¿½ï¿½o de Procedures --
 ---------------------------
 
--- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma espécie de carga inicial de USERS)
+-- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma espï¿½cie de carga inicial de USERS)
 CREATE OR REPLACE PROCEDURE sp_cadastrar_lider_user AS
 BEGIN
     FOR i IN (
@@ -75,13 +75,13 @@ BEGIN
     COMMIT;
 END;
 
--- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os líderes já existentes na base
+-- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os lï¿½deres jï¿½ existentes na base
 BEGIN
     sp_cadastrar_lider_user;
 END;
 
 
--- Trigger para excluir um registro automaticamente na tabela de USERS após uma exclusão em LIDER
+-- Trigger para excluir um registro automaticamente na tabela de USERS apï¿½s uma exclusï¿½o em LIDER
 --CREATE OR REPLACE TRIGGER trg_delete_user_automaticamente
 --AFTER DELETE ON LIDER
 --FOR EACH ROW
@@ -96,10 +96,10 @@ END;
 
 
 ------------------------
--- Criação de Pacotes --
+-- Criaï¿½ï¿½o de Pacotes --
 ------------------------
 
--- Criação do pacote de OFICIAL
+-- Criaï¿½ï¿½o do pacote de OFICIAL
 CREATE OR REPLACE PACKAGE pkg_oficial AS
     PROCEDURE get_habitantes_relatorio(p_oficial_id IN CHAR);
 END pkg_oficial;
@@ -151,16 +151,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_oficial AS
 END pkg_oficial;
 
 
--- INTERMINADO (NÃO RETORNA NADA QUE ESTÁ NO LOOP)
+-- INTERMINADO (Nï¿½O RETORNA NADA QUE ESTï¿½ NO LOOP)
 
--- Testando o relatório do OFICIAL:
+-- Testando o relatï¿½rio do OFICIAL:
 BEGIN
     pkg_oficial.get_habitantes_relatorio(p_oficial_id => '999.999.999-98');
 END;
 
 
 
---Criação do pacote do Lider de facção
+--Criaï¿½ï¿½o do pacote do Lider de facï¿½ï¿½o
 CREATE OR REPLACE PACKAGE PacoteLiderFaccao AS
     -- Procedimento para remover uma fac??o de uma na??o
     PROCEDURE RemoverFaccaoDeNacao(
@@ -252,13 +252,13 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facção da nação: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
             RAISE;
     END CredenciarComunidadesNovas;
 END PacoteLiderFaccao;
 
 
--- View para visualização e credenciamento das comunidades por parte do lider
+-- View para visualizaï¿½ï¿½o e credenciamento das comunidades por parte do lider
 CREATE OR REPLACE VIEW VW_LIDER_FACCAO AS
 SELECT
     n.NOME AS NOME_NACAO,
@@ -290,19 +290,45 @@ LEFT JOIN
     PARTICIPA pa ON pa.FACCAO = f.NOME AND pa.ESPECIE = c.ESPECIE AND pa.COMUNIDADE = c.NOME;
 
 
--- Trigger instead-of para manipular as operaçõees de inserção
+-- Trigger instead-of para manipular as operaï¿½ï¿½ees de inserï¿½ï¿½o
 CREATE OR REPLACE TRIGGER trg_vw_lider_faccao_insert
 INSTEAD OF INSERT ON VW_LIDER_FACCAO
 FOR EACH ROW
+DECLARE
+    v_faccao VARCHAR2(100);
 BEGIN
     BEGIN
+        -- Check if the faccao and comunidade exist
+        SELECT f.NOME
+        INTO v_faccao
+        FROM
+            NACAO n
+        JOIN
+            DOMINANCIA d ON n.NOME = d.NACAO AND d.DATA_FIM IS NULL
+        JOIN
+            PLANETA p ON d.PLANETA = p.ID_ASTRO
+        JOIN
+            HABITACAO h ON p.ID_ASTRO = h.PLANETA AND h.DATA_FIM IS NULL
+        JOIN
+            COMUNIDADE c ON h.ESPECIE = c.ESPECIE AND h.COMUNIDADE = c.NOME
+        JOIN
+            NACAO_FACCAO nf ON n.NOME = nf.NACAO
+        JOIN
+            FACCAO f ON nf.FACCAO = f.NOME
+        WHERE f.NOME = :NEW.FACCAO AND c.NOME = :NEW.NOME_COMUNIDADE;
+
+        -- If the faccao and comunidade exist, insert into PARTICIPA
         INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE)
         VALUES (:NEW.FACCAO, :NEW.ESPECIE, :NEW.NOME_COMUNIDADE);
+        
     EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20002, 'A comunidade nÃ£o pertence a um planeta possivel.');
         WHEN OTHERS THEN
-            RAISE_APPLICATION_ERROR(-20001, 'Erro ao inserir dados na tabela PARTICIPA');
+            RAISE_APPLICATION_ERROR(-20001, 'Erro ao inserir dados na tabela PARTICIPA: ' || SQLERRM);
     END;
 END;
+
 
 
 -- Teste da procedure do oficial
@@ -349,22 +375,22 @@ END;
 ----------------------------------------------------------------------------------------------------------------------------
 
 ----------------------------------
--- Relatório de Líder de Facção --
+-- Relatï¿½rio de Lï¿½der de Facï¿½ï¿½o --
 ----------------------------------
 
 
--- Criando um Tipo para exibir o relatório de LIDER de FACCAO
+-- Criando um Tipo para exibir o relatï¿½rio de LIDER de FACCAO
 CREATE OR REPLACE TYPE tp_relatorio_lider_faccao AS OBJECT (
-    agrupamento VARCHAR2(100), -- Contém os itens distintos para o agrupamento escolhido.
-    especie VARCHAR2(100), -- Campo adicionado para o caso DEFAULT, onde queremos exibir a espécie como informação da comunidade. Substitui o campo "qtd_comunidades" no caso DEFAULT.
-    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregação sendo definida.
-    total_habitantes NUMBER -- Agregado de total de habitantes na determinada comunidade ou na agregação sendo definida.
+    agrupamento VARCHAR2(100), -- Contï¿½m os itens distintos para o agrupamento escolhido.
+    especie VARCHAR2(100), -- Campo adicionado para o caso DEFAULT, onde queremos exibir a espï¿½cie como informaï¿½ï¿½o da comunidade. Substitui o campo "qtd_comunidades" no caso DEFAULT.
+    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregaï¿½ï¿½o sendo definida.
+    total_habitantes NUMBER -- Agregado de total de habitantes na determinada comunidade ou na agregaï¿½ï¿½o sendo definida.
 );
 
--- Criando um Tipo para a tabela de registros que será utilizada para exibir o relatório de LIDER de FACCAO
+-- Criando um Tipo para a tabela de registros que serï¿½ utilizada para exibir o relatï¿½rio de LIDER de FACCAO
 CREATE OR REPLACE TYPE tp_relatorio_tabela_lider_faccao AS TABLE OF tp_relatorio_lider_faccao;
 
--- Função para gerar o relatório do LIDER de FACCAO
+-- Funï¿½ï¿½o para gerar o relatï¿½rio do LIDER de FACCAO
 CREATE OR REPLACE FUNCTION relatorio_lider_faccao(
     p_lider_id IN CHAR,
     p_agrupamento IN VARCHAR2 DEFAULT NULL
@@ -381,7 +407,7 @@ BEGIN
 
     -- Verificando se a FACCAO foi encontrada
     IF v_faccao_nome IS NOT NULL THEN
-        -- Caso DEFAULT: informações sobre as comunidades da FACCAO do LIDER
+        -- Caso DEFAULT: informaï¿½ï¿½es sobre as comunidades da FACCAO do LIDER
         IF p_agrupamento IS NULL THEN
             FOR rec IN (
                 SELECT C.NOME AS AGRUPAMENTO, C.ESPECIE AS ESPECIE, C.QTD_HABITANTES
@@ -463,7 +489,7 @@ EXCEPTION
 END;
 
 
--- Testes de chamada da função:
+-- Testes de chamada da funï¿½ï¿½o:
 -- Caso DEFAULT
 SELECT agrupamento AS COMUNIDADE, especie, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98'));
 
