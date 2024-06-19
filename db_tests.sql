@@ -20,12 +20,12 @@ BEGIN
     PacoteLiderFaccao.IndicarNovoLiderFaccao('FAC_CAMERA', '555.436.559-76');
 END;
 
--- Credenciar comunidades novas
---BEGIN
---    PacoteLiderFaccao.CredenciarComunidadesNovas('', '');
---END;
+-- Credenciar comunidades novas -- OK
+BEGIN
+    PacoteLiderFaccao.CredenciarComunidadesNovas('faccao_suprema', 'Ut nam', 'com_fritas');
+END;
 
--- Remover Faccao de Nacao
+-- Remover Faccao de Nacao  -- OK
 BEGIN
     PacoteLiderFaccao.RemoverFaccaoDeNacao('Sit saepe ad.', 'Faccao_Caballo');
 END;
