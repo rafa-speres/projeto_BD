@@ -1,44 +1,39 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from database import conectar_bd
+from datetime import datetime
 
 def incluir_nacao(usuario, federacao):
     federacao = federacao.get()
     conn = conectar_bd()
     cursor = conn.cursor()
-    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
     result = cursor.fetchone()
     if result:
         nacao = result[0]
         try:
-            cursor.execute(f"""
-                BEGIN
-                    pkg_comandante.incluir_nacao_em_federacao(p_user_id => '{usuario}', p_nacao => '{nacao}', p_federacao => '{federacao}');
-                END;
-            """)
+            cursor.callproc("pkg_comandante.incluir_nacao_em_federacao", [usuario, nacao, federacao])
             conn.commit()
-            messagebox.showinfo("Sucesso", "Nação incluida!")
+            messagebox.showinfo("Sucesso", "Nação incluída!")
         except Exception as e:
             conn.rollback()
             messagebox.showerror("Erro", f"Falha ao incluir nação: {e}")
         finally:
             cursor.close()
             conn.close()
-        
+    else:
+        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
+            
 def excluir_nacao(usuario, federacao):
     federacao = federacao.get()
     conn = conectar_bd()
     cursor = conn.cursor()
-    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
     result = cursor.fetchone()
     if result:
         nacao = result[0]
         try:
-            cursor.execute(f"""
-                BEGIN
-                    pkg_comandante.excluir_nacao_de_federacao(p_user_id => '{usuario}', p_nacao => '{nacao}', p_federacao => '{federacao}');
-                END;
-            """)
+            cursor.callproc("pkg_comandante.excluir_nacao_de_federacao", [usuario, nacao, federacao])
             conn.commit()
             messagebox.showinfo("Sucesso", "Nação excluida da federacao!")
         except Exception as e:
@@ -47,52 +42,62 @@ def excluir_nacao(usuario, federacao):
         finally:
             cursor.close()
             conn.close()
+    else:
+        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
         
+
 def criar_federacao(usuario, federacao):
     federacao = federacao.get()
     conn = conectar_bd()
     cursor = conn.cursor()
-    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
     result = cursor.fetchone()
     if result:
         nacao = result[0]
+        # Pegando a data atual do sistema
+        data_atual = datetime.now()
+            
+        # Convertendo a data para o formato aceito pelo Oracle
+        data_ini = data_atual.date()
         try:
-            cursor.execute(f"""
-                BEGIN
-                    pkg_comandante.criar_federacao_com_nacao(p_federacao => '{federacao}', p_user_id => '{usuario}', p_nacao => '{nacao}',p_data_fund => SYSDATE);
-                END;
-            """)
+            cursor.callproc("pkg_comandante.criar_federacao_com_nacao", [federacao, usuario, nacao, data_ini])
             conn.commit()
             messagebox.showinfo("Sucesso", "Federação criada")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao criar federacao: {e}")
+            messagebox.showerror("Erro", f"Falha ao criar federação: {e}")
         finally:
             cursor.close()
             conn.close()
+    else:
+        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
             
 def inserir_dominancia(usuario, planeta):
-    federacao = federacao.get()
+    planeta = planeta.get()
     conn = conectar_bd()
     cursor = conn.cursor()
-    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
     result = cursor.fetchone()
     if result:
         nacao = result[0]
+        # Pegando a data atual do sistema
+        data_atual = datetime.now()
+            
+        # Convertendo a data para o formato aceito pelo Oracle
+        data_ini = data_atual.date()
         try:
-            cursor.execute(f"""
-                BEGIN
-                    pkg_comandante.inserir_dominancia(p_planeta => '{planeta}', p_nacao => '{nacao}', p_data_ini => SYSDATE);
-                END;
-            """)
+            cursor.callproc("pkg_comandante.inserir_dominancia", [planeta, nacao, data_ini])
             conn.commit()
-            messagebox.showinfo("Sucesso", "Dominancia inserida!")
+            messagebox.showinfo("Sucesso", "Dominância inserida!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao inserir dominancia: {e}")
+            messagebox.showerror("Erro", f"Falha ao inserir dominância: {e}")
         finally:
             cursor.close()
             conn.close()
+    else:
+        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
+
 
 
 def alterar_nome_faccao(faccao, nova_faccao):
@@ -277,8 +282,8 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
     entrada_planeta = ctk.CTkEntry(frame_overview_comandante)
     entrada_planeta.pack(pady=(0, 10))
     
-    #botao para criar federacao
-    botao_inserir_dominancia = ctk.CTkButton(frame_overview_comandante, text="Inserir dominancia", command=lambda: criar_federacao(usuario, entrada_federacao_c), width=400, height=40)
+    #botao para inserir dominancia
+    botao_inserir_dominancia = ctk.CTkButton(frame_overview_comandante, text="Inserir dominancia", command=lambda: inserir_dominancia(usuario, entrada_planeta), width=400, height=40)
     botao_inserir_dominancia.pack(pady=10)
     
     
