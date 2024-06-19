@@ -44,3 +44,23 @@ SELECT agrupamento AS SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(rela
 
 -- Agrupamento por NACAO -- OK
 SELECT agrupamento AS NACAO, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'NACAO'));
+
+
+-------------------------
+-- RELATÓRIO - Oficial --
+-------------------------
+
+-- Caso DEFAULT -- OK
+SELECT agrupamento as COMUNIDADE, total_habitantes, data_ini as DATA_INICIO, data_fim FROM TABLE(pkg_oficial.relatorio_oficial('999.999.999-98'));
+
+-- Agrupamento por FACCAO -- OK
+SELECT agrupamento as FACCAO, qtd_comunidades, total_habitantes FROM TABLE(pkg_oficial.relatorio_oficial('999.999.999-98', 'FACCAO'));
+
+-- Agrupamento por ESPECIE -- OK
+SELECT agrupamento as ESPECIE, qtd_comunidades, total_habitantes FROM TABLE(pkg_oficial.relatorio_oficial('999.999.999-98', 'ESPECIE'));
+
+-- Agrupamento por PLANETA  -- OK
+SELECT agrupamento as PLANETA, qtd_comunidades, total_habitantes FROM TABLE(pkg_oficial.relatorio_oficial('999.999.999-98', 'PLANETA'));
+
+-- Agrupamento por SISTEMA -- OK
+SELECT agrupamento as SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(pkg_oficial.relatorio_oficial('999.999.999-98', 'SISTEMA'));
