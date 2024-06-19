@@ -523,7 +523,7 @@ CREATE OR REPLACE PACKAGE PACOTE_CIENTISTA AS
 
   FUNCTION ler_estrela(
     p_id_estrela IN VARCHAR2
-  ) RETURN SYS_REFCURSOR;
+  ) RETURN  tp_tabela_estrela PIPELINED;
 
   PROCEDURE atualizar_estrela(
     p_id_estrela IN VARCHAR2,
@@ -574,22 +574,31 @@ CREATE OR REPLACE PACKAGE BODY PACOTE_CIENTISTA AS
 
   FUNCTION ler_estrela(
     p_id_estrela IN VARCHAR2
-  ) RETURN SYS_REFCURSOR IS
-    v_estrela SYS_REFCURSOR;
-  BEGIN
-    OPEN v_estrela FOR
-    SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
-    FROM ESTRELA
-    WHERE ID_ESTRELA = p_id_estrela;
-    RETURN v_estrela;
+  ) RETURN  tp_tabela_estrela PIPELINED;
+    BEGIN
+    FOR rec IN (
+      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
+      FROM ESTRELA
+      WHERE ID_ESTRELA == p_id_estrela
+    ) LOOP
+      PIPE ROW(tp_estrela(
+        rec.ID_ESTRELA,
+        rec.NOME,
+        rec.CLASSIFICACAO,
+        rec.MASSA,
+        rec.X,
+        rec.Y,
+        rec.Z
+      ));
+    END LOOP;
   EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-      DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
-      RETURN NULL;
     WHEN OTHERS THEN
-      DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
-      RETURN NULL;
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
+      RAISE;
   END ler_estrela;
+
+
+
 
   PROCEDURE atualizar_estrela(
     p_id_estrela IN VARCHAR2,
