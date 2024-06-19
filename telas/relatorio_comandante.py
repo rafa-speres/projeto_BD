@@ -5,11 +5,12 @@ def relatorio_comandante(usuario, frame):
     if usuario:
         conn = conectar_bd()
         cursor = conn.cursor()
-        cursor.execute(f"""
+        '''cursor.execute(f"""
                 BEGIN
                     pkg_comandante.relatorio_planetas_dominados(p_comandante_id => '{usuario}');
                 END;
-            """)
+            """)'''
+        cursor.callproc("pkg_comandante.relatorio_planetas_dominados", [usuario])
         result = cursor.fetchall()
         if result:
             colunas = [col[0] for col in cursor.description]
@@ -33,11 +34,12 @@ def relatorio_comandante_distancia(usuario, frame, distancia):
     if usuario:
         conn = conectar_bd()
         cursor = conn.cursor()
-        cursor.execute(f"""
+        '''cursor.execute(f"""
                 BEGIN
                     pkg_comandante.relatorio_planetas_potenciais(p_comandante_id => '{usuario}', p_distancia_maxima => {distancia});
                 END;
-            """)
+            """)'''
+        cursor.callproc("pkg_comandante.relatorio_planetas_potenciais", [usuario, distancia])
         result = cursor.fetchall()
         if result:
             colunas = [col[0] for col in cursor.description]
