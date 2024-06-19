@@ -11,42 +11,49 @@ def criar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
     cY = cY.get()
     cZ = cZ.get()
     
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PACOTE_CIENTISTA.criar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Estrela criada!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao criar estrela: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    if id_estrela and nome and massa and classificacao and cX and cY and cZ:
+        
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PACOTE_CIENTISTA.criar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Estrela criada!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao criar estrela")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
         
 def deletar_estrela(id_estrela):
     id_estrela = id_estrela.get()
     
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PACOTE_CIENTISTA.deletar_estrela('{id_estrela}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Estrela excluida!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao excluir estrela: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    if id_estrela:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PACOTE_CIENTISTA.deletar_estrela('{id_estrela}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Estrela excluida!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao excluir estrela: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
         
 def atualizar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
     id_estrela = id_estrela.get()
@@ -57,64 +64,74 @@ def atualizar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
     cY = cY.get()
     cZ = cZ.get()
     
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PACOTE_CIENTISTA.atualizar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Estrela atualizada!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao atualizar estrela: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    if id_estrela and nome and massa and classificacao and cX and cY and cZ:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PACOTE_CIENTISTA.atualizar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Estrela atualizada!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao atualizar estrela: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
 
 def alterar_nome_faccao(faccao, nova_faccao):
     nova_faccao = nova_faccao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Nome de facção alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    if nova_faccao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Nome de facção alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
 
 def alterar_lider(faccao, novo_lider):
     novo_lider = novo_lider.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    check = 0
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Lider alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
-        check = 1
-    finally:
-        cursor.close()
-        conn.close()
-        if check == 0:
-            faccao[0] = 0
+    
+    if novo_lider:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        check = 0
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Lider alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+            check = 1
+        finally:
+            cursor.close()
+            conn.close()
+            if check == 0:
+                faccao[0] = 0
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
 
 def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostrar_relatorio_cientista, mostrar_relatorio_lider, mostrar_tela_cientista):
     alterar_lider(faccao,novo_lider)
@@ -126,22 +143,25 @@ def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostr
 def credenciar_comunidades(faccao, especie, comunidade):
     especie = especie.get()
     comunidade = comunidade.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Comunidade credenciada!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    if especie and comunidade:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Comunidade credenciada!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
 
 def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_cientista, mostrar_relatorio_lider, mostrar_tela_cientista):
     #faccao = [faccao]

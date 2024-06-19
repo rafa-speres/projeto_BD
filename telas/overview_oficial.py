@@ -4,45 +4,53 @@ from database import conectar_bd
 
 def alterar_nome_faccao(faccao, nova_faccao):
     nova_faccao = nova_faccao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Nome de facção alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    
+    if nova_faccao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Nome de facção alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar nome da facção")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def alterar_lider(faccao, novo_lider):
     novo_lider = novo_lider.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    check = 0
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Lider alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
-        check = 1
-    finally:
-        cursor.close()
-        conn.close()
-        if check == 0:
-            faccao[0] = 0
+    
+    if novo_lider:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        check = 0
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Lider alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar lider")
+            check = 1
+        finally:
+            cursor.close()
+            conn.close()
+            if check == 0:
+                faccao[0] = 0
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial):
     alterar_lider(faccao,novo_lider)
@@ -54,25 +62,28 @@ def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostr
 def credenciar_comunidades(faccao, especie, comunidade):
     especie = especie.get()
     comunidade = comunidade.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Comunidade credenciada!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    
+    if especie and comunidade:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Comunidade credenciada!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial):
-    #faccao = [faccao]
     if not isinstance(faccao, list):
         faccao = [faccao]
     tipo_usuario = "oficial"

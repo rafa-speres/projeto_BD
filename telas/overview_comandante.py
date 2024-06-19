@@ -5,142 +5,164 @@ from datetime import datetime
 
 def incluir_nacao(usuario, federacao):
     federacao = federacao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
-    result = cursor.fetchone()
-    if result:
-        nacao = result[0]
-        try:
-            cursor.callproc("pkg_comandante.incluir_nacao_em_federacao", [usuario, nacao, federacao])
-            conn.commit()
-            messagebox.showinfo("Sucesso", "Nação incluída!")
-        except Exception as e:
-            conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao incluir nação: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+    if federacao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
+        result = cursor.fetchone()
+        if result:
+            nacao = result[0]
+            try:
+                cursor.callproc("pkg_comandante.incluir_nacao_em_federacao", [usuario, nacao, federacao])
+                conn.commit()
+                messagebox.showinfo("Sucesso", "Nação incluída!")
+            except Exception as e:
+                conn.rollback()
+                messagebox.showerror("Erro", f"Falha ao incluir nação")
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
     else:
-        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
-            
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")      
+        
+          
 def excluir_nacao(usuario, federacao):
     federacao = federacao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
-    result = cursor.fetchone()
-    if result:
-        nacao = result[0]
-        try:
-            cursor.callproc("pkg_comandante.excluir_nacao_de_federacao", [usuario, nacao, federacao])
-            conn.commit()
-            messagebox.showinfo("Sucesso", "Nação excluida da federacao!")
-        except Exception as e:
-            conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao excluir nacao da federacao: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+    
+    if federacao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
+        result = cursor.fetchone()
+        if result:
+            nacao = result[0]
+            try:
+                cursor.callproc("pkg_comandante.excluir_nacao_de_federacao", [usuario, nacao, federacao])
+                conn.commit()
+                messagebox.showinfo("Sucesso", "Nação excluida da federacao!")
+            except Exception as e:
+                conn.rollback()
+                messagebox.showerror("Erro", f"Falha ao excluir nacao da federacao")
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
     else:
-        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
-        
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")      
 
 def criar_federacao(usuario, federacao):
     federacao = federacao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
-    result = cursor.fetchone()
-    if result:
-        nacao = result[0]
-        # Pegando a data atual do sistema
-        data_atual = datetime.now()
-            
-        # Convertendo a data para o formato aceito pelo Oracle
-        data_ini = data_atual.date()
-        try:
-            cursor.callproc("pkg_comandante.criar_federacao_com_nacao", [federacao, usuario, nacao, data_ini])
-            conn.commit()
-            messagebox.showinfo("Sucesso", "Federação criada")
-        except Exception as e:
-            conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao criar federação: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+    
+    if federacao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
+        result = cursor.fetchone()
+        if result:
+            nacao = result[0]
+            # Pegando a data atual do sistema
+            data_atual = datetime.now()
+                
+            # Convertendo a data para o formato aceito pelo Oracle
+            data_ini = data_atual.date()
+            try:
+                cursor.callproc("pkg_comandante.criar_federacao_com_nacao", [federacao, usuario, nacao, data_ini])
+                conn.commit()
+                messagebox.showinfo("Sucesso", "Federação criada")
+            except Exception as e:
+                conn.rollback()
+                messagebox.showerror("Erro", f"Falha ao criar federação")
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
     else:
-        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
             
 def inserir_dominancia(usuario, planeta):
     planeta = planeta.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
-    result = cursor.fetchone()
-    if result:
-        nacao = result[0]
-        # Pegando a data atual do sistema
-        data_atual = datetime.now()
-            
-        # Convertendo a data para o formato aceito pelo Oracle
-        data_ini = data_atual.date()
-        try:
-            cursor.callproc("pkg_comandante.inserir_dominancia", [planeta, nacao, data_ini])
-            conn.commit()
-            messagebox.showinfo("Sucesso", "Dominância inserida!")
-        except Exception as e:
-            conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao inserir dominância: {e}")
-        finally:
-            cursor.close()
-            conn.close()
+    
+    if planeta:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        cursor.execute("SELECT NACAO FROM LIDER WHERE CPI = :1", [usuario])
+        result = cursor.fetchone()
+        if result:
+            nacao = result[0]
+            # Pegando a data atual do sistema
+            data_atual = datetime.now()
+                
+            # Convertendo a data para o formato aceito pelo Oracle
+            data_ini = data_atual.date()
+            try:
+                cursor.callproc("pkg_comandante.inserir_dominancia", [planeta, nacao, data_ini])
+                conn.commit()
+                messagebox.showinfo("Sucesso", "Dominância inserida!")
+            except Exception as e:
+                conn.rollback()
+                messagebox.showerror("Erro", f"Falha ao inserir dominância")
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
     else:
-        messagebox.showerror("Erro", "Nação não encontrada para o usuário fornecido.")
-
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 
 def alterar_nome_faccao(faccao, nova_faccao):
     nova_faccao = nova_faccao.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Nome de facção alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    
+    if nova_faccao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.AlterarNomeFaccao('{faccao[0]}', '{nova_faccao}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Nome de facção alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar nome da facção")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def alterar_lider(faccao, novo_lider):
     novo_lider = novo_lider.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    check = 0
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Lider alterado!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
-        check = 1
-    finally:
-        cursor.close()
-        conn.close()
-        if check == 0:
-            faccao[0] = 0
+    
+    if novo_lider:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        check = 0
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.IndicarNovoLiderFaccao('{faccao[0]}', '{novo_lider}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Lider alterado!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao alterar lider")
+            check = 1
+        finally:
+            cursor.close()
+            conn.close()
+            if check == 0:
+                faccao[0] = 0
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante):
     alterar_lider(faccao,novo_lider)
@@ -152,22 +174,26 @@ def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostr
 def credenciar_comunidades(faccao, especie, comunidade):
     especie = especie.get()
     comunidade = comunidade.get()
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(f"""
-            BEGIN
-                PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
-            END;
-        """)
-        conn.commit()
-        messagebox.showinfo("Sucesso", "Comunidade credenciada!")
-    except Exception as e:
-        conn.rollback()
-        messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+    
+    if especie and comunidade:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.CredenciarComunidadesNovas('{faccao[0]}', '{especie}', '{comunidade}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Comunidade credenciada!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
 
 def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_comandante, mostrar_relatorio_lider, mostrar_tela_comandante):
     #faccao = [faccao]
