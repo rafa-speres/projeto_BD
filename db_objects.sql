@@ -3,11 +3,11 @@
 ---------------------------------------------------
 
 ------------------------------------------------------
--- Scripts para Criaï¿½ï¿½o de Objetos na Base de Dados --
+-- Scripts para Criacao de Objetos na Base de Dados --
 ------------------------------------------------------
 
 ------------------------
--- Criaï¿½ï¿½o de Tabelas --
+-- Criacao de Tabelas --
 ------------------------
 
 -- Criando a tabela "USERS"
@@ -28,12 +28,13 @@ CREATE TABLE LOG_TABLE (
     CONSTRAINT FK_LOG_TABLE_USERS FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
 );
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------
--- Criaï¿½ï¿½o de Triggers --
+-- Criacao de Triggers --
 -------------------------
 
--- Trigger para armazenar a senha de um USER utilizando a funï¿½ï¿½o MD5 para hash
+-- Trigger para armazenar a senha de um USER utilizando a funcao MD5 para hash
 CREATE OR REPLACE TRIGGER trg_hash_password
 BEFORE INSERT OR UPDATE OF password
 ON USERS
@@ -46,7 +47,7 @@ BEGIN
 END;
 
 
--- Trigger para inserir um registro automaticamente na tabela de USERS apï¿½s uma inserï¿½ï¿½o em LIDER
+-- Trigger para inserir um registro automaticamente na tabela de USERS apos uma insercao em LIDER
 CREATE OR REPLACE TRIGGER trg_insert_user_automaticamente
 AFTER INSERT ON LIDER
 FOR EACH ROW
@@ -55,12 +56,13 @@ BEGIN
     VALUES ('admin', :NEW.CPI);
 END;
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ---------------------------
--- Criaï¿½ï¿½o de Procedures --
+-- Criacao de Procedures --
 ---------------------------
 
--- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma espï¿½cie de carga inicial de USERS)
+-- Procedure para encontrar um Lider sem tupla na tabela USERS e inseri-lo com uma senha default (uma especie de carga inicial de USERS)
 CREATE OR REPLACE PROCEDURE sp_cadastrar_lider_user AS
 BEGIN
     FOR i IN (
@@ -75,94 +77,22 @@ BEGIN
     COMMIT;
 END;
 
--- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os lï¿½deres jï¿½ existentes na base
+-- Chamando a Procedure "sp_cadastrar_lider_user" para cadastrar os lideres ja existentes na base
 BEGIN
     sp_cadastrar_lider_user;
 END;
 
 
--- Trigger para excluir um registro automaticamente na tabela de USERS apï¿½s uma exclusï¿½o em LIDER
---CREATE OR REPLACE TRIGGER trg_delete_user_automaticamente
---AFTER DELETE ON LIDER
---FOR EACH ROW
---BEGIN
---    DELETE FROM USERS WHERE id_lider = :OLD.CPI;
---END;
-
-
-
--- Delete para teste do trigger "trg_delete_user_automaticamente"
---DELETE FROM LIDER WHERE CPI = '444.444.444-44'; --MUTANTE
-
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ------------------------
--- Criaï¿½ï¿½o de Pacotes --
+-- Criacao de Pacotes --
 ------------------------
 
--- Criaï¿½ï¿½o do pacote de OFICIAL
-CREATE OR REPLACE PACKAGE pkg_oficial AS
-    PROCEDURE get_habitantes_relatorio(p_oficial_id IN CHAR);
-END pkg_oficial;
+-- Pacote do LIDER de FACCAO --
 
--- Corpo do pacote de OFICIAL
-CREATE OR REPLACE PACKAGE BODY pkg_oficial AS
-    
-    
-    PROCEDURE get_habitantes_relatorio(p_oficial_id IN CHAR) IS
-        CURSOR c_habitantes IS
-            SELECT 
-                e.nome AS especie_nome,
-                e.inteligente AS especie_inteligente,
-                c.nome AS comunidade_nome,
-                c.qtd_habitantes AS qtd_habitantes,
-                p.id_astro AS planeta_nome,
-                s.estrela AS sistema_estrela,
-                s.nome AS sistema_nome,
-                f.nome AS faccao_nome,
-                h.data_ini AS data_inicio,
-                h.data_fim AS data_fim
-            FROM 
-                Habitacao h
-                JOIN Especie e ON h.especie = e.nome
-                JOIN Comunidade c ON h.especie = c.especie AND h.comunidade = c.nome
-                JOIN Planeta p ON h.planeta = p.id_astro
-                LEFT JOIN Sistema s ON p.id_astro = s.estrela
-                LEFT JOIN Participa pa ON h.especie = pa.especie AND h.comunidade = pa.comunidade
-                LEFT JOIN Faccao f ON pa.faccao = f.nome
-            WHERE
-                p.id_astro IN (
-                    SELECT planeta 
-                    FROM Dominancia
-                    WHERE nacao = (SELECT nacao FROM Lider WHERE cpi = p_oficial_id)
-                )
-            ORDER BY e.nome, c.nome, p.id_astro, s.estrela;
-    BEGIN
-        DBMS_OUTPUT.PUT_LINE('ENTREI NO BEGIN. ID: ' || p_oficial_id);
-        FOR r IN c_habitantes LOOP
-            DBMS_OUTPUT.PUT_LINE('Especie: ' || r.especie_nome || ', Inteligente: ' || r.especie_inteligente || 
-                                 ', Comunidade: ' || r.comunidade_nome || ', Qtd Habitantes: ' || r.qtd_habitantes || 
-                                 ', Planeta: ' || r.planeta_nome ||
-                                 ', Sistema: ' || r.sistema_nome || ' (' || r.sistema_estrela || ')' || 
-                                 ', Faccao: ' || r.faccao_nome || ', Data Inicio: ' || r.data_inicio || 
-                                 ', Data Fim: ' || r.data_fim);
-        END LOOP;
-    END get_habitantes_relatorio;
-
-END pkg_oficial;
-
-
--- INTERMINADO (Nï¿½O RETORNA NADA QUE ESTï¿½ NO LOOP)
-
--- Testando o relatï¿½rio do OFICIAL:
-BEGIN
-    pkg_oficial.get_habitantes_relatorio(p_oficial_id => '999.999.999-98');
-END;
-
-
-
---Criaï¿½ï¿½o do pacote do Lider de facï¿½ï¿½o
 CREATE OR REPLACE PACKAGE PacoteLiderFaccao AS
-    -- Procedimento para remover uma fac??o de uma na??o
+    -- Procedimento para remover uma FACCAO de NACAO
     PROCEDURE RemoverFaccaoDeNacao(
         p_nacao IN VARCHAR2,
         p_faccao IN VARCHAR2
@@ -186,14 +116,14 @@ CREATE OR REPLACE PACKAGE PacoteLiderFaccao AS
 END PacoteLiderFaccao;
 
 
--- Corpo do pacote
+-- Corpo do pacote do LIDER de FACCAO
 CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
     PROCEDURE RemoverFaccaoDeNacao(
         p_nacao IN VARCHAR2,
         p_faccao IN VARCHAR2
     ) IS
     BEGIN
-        -- Remove a rela??o entre a naï¿½ï¿½o e a facï¿½ï¿½o
+        -- Remove a relacao entre a NACAO e a FACCAO
         DELETE FROM NACAO_FACCAO
         WHERE NACAO = p_nacao
         AND FACCAO = p_faccao;
@@ -201,7 +131,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover faccao da nacao: ' || SQLERRM);
             RAISE;
     END RemoverFaccaoDeNacao;
 
@@ -218,7 +148,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover faccao da nacao: ' || SQLERRM);
             RAISE;
     END AlterarNomeFaccao;
 
@@ -235,7 +165,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover faccao da nacao: ' || SQLERRM);
             RAISE;
     END IndicarNovoLiderFaccao;
 
@@ -252,13 +182,13 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover facï¿½ï¿½o da naï¿½ï¿½o: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao remover faccao da nacao: ' || SQLERRM);
             RAISE;
     END CredenciarComunidadesNovas;
 END PacoteLiderFaccao;
 
 
--- View para visualizaï¿½ï¿½o e credenciamento das comunidades por parte do lider
+-- View para visualizacao e credenciamento das comunidades por parte do lider
 CREATE OR REPLACE VIEW VW_LIDER_FACCAO AS
 SELECT
     n.NOME AS NOME_NACAO,
@@ -290,7 +220,7 @@ LEFT JOIN
     PARTICIPA pa ON pa.FACCAO = f.NOME AND pa.ESPECIE = c.ESPECIE AND pa.COMUNIDADE = c.NOME;
 
 
--- Trigger instead-of para manipular as operaï¿½ï¿½ees de inserï¿½ï¿½o
+-- Trigger instead-of para manipular as operacoes de insercao
 CREATE OR REPLACE TRIGGER trg_vw_lider_faccao_insert
 INSTEAD OF INSERT ON VW_LIDER_FACCAO
 FOR EACH ROW
@@ -323,7 +253,7 @@ BEGIN
         
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20002, 'A comunidade nÃ£o pertence a um planeta possivel.');
+            RAISE_APPLICATION_ERROR(-20002, 'A comunidade não pertence a um planeta possivel.');
         WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR(-20001, 'Erro ao inserir dados na tabela PARTICIPA: ' || SQLERRM);
     END;
@@ -331,66 +261,421 @@ END;
 
 
 
--- Teste da procedure do oficial
-
---SELECT 
---    e.nome AS especie_nome,
---    e.inteligente AS especie_inteligente,
---    c.nome AS comunidade_nome,
---    c.qtd_habitantes AS qtd_habitantes,
---    p.id_astro AS planeta_nome,
---    s.estrela AS sistema_estrela,
---    s.nome AS sistema_nome,
---    f.nome AS faccao_nome,
---    h.data_ini AS data_inicio,
---    h.data_fim AS data_fim
---    FROM 
---        Habitacao h
---        JOIN Especie e ON h.especie = e.nome
---        JOIN Comunidade c ON h.especie = c.especie AND h.comunidade = c.nome
---        JOIN Planeta p ON h.planeta = p.id_astro
---        LEFT JOIN Sistema s ON p.id_astro = s.estrela
---        LEFT JOIN Participa pa ON h.especie = pa.especie AND h.comunidade = pa.comunidade
---        LEFT JOIN Faccao f ON pa.faccao = f.nome
---    WHERE
---        p.id_astro IN (
---            SELECT planeta 
---            FROM Dominancia
---            WHERE nacao = (SELECT nacao FROM Lider WHERE cpi = p_oficial_id)
---        )
---    ORDER BY e.nome, c.nome, p.id_astro, s.estrela;
---
---
---
---SELECT 
---    * --e.nome AS especie_nome,
---    --e.inteligente AS especie_inteligente,
---    -- c.nome AS comunidade_nome,
---    FROM 
---        Habitacao h
---        JOIN Especie e ON h.especie = e.nome
---        JOIN Comunidade c ON h.especie = c.especie;
 
 
-----------------------------------------------------------------------------------------------------------------------------
+-- Pacote do OFICIAL --
 
-----------------------------------
--- Relatï¿½rio de Lï¿½der de Facï¿½ï¿½o --
-----------------------------------
-
-
--- Criando um Tipo para exibir o relatï¿½rio de LIDER de FACCAO
-CREATE OR REPLACE TYPE tp_relatorio_lider_faccao AS OBJECT (
-    agrupamento VARCHAR2(100), -- Contï¿½m os itens distintos para o agrupamento escolhido.
-    especie VARCHAR2(100), -- Campo adicionado para o caso DEFAULT, onde queremos exibir a espï¿½cie como informaï¿½ï¿½o da comunidade. Substitui o campo "qtd_comunidades" no caso DEFAULT.
-    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregaï¿½ï¿½o sendo definida.
-    total_habitantes NUMBER -- Agregado de total de habitantes na determinada comunidade ou na agregaï¿½ï¿½o sendo definida.
+-- Criando um Tipo para exibir o relatório do OFICIAL
+CREATE OR REPLACE TYPE tp_relatorio_oficial AS OBJECT (
+    agrupamento VARCHAR2(100), -- Contém os itens distintos para o agrupamento escolhido.
+    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregação sendo definida.
+    total_habitantes NUMBER, -- Agregado de total de habitantes na determinada comunidade ou na agregação sendo definida.
+    data_ini DATE, -- Data inicial de HABITACAO da COMUNIDADE
+    data_fim DATE -- Data final de HABITACAO da COMUNIDADE ou agrupamento
 );
 
--- Criando um Tipo para a tabela de registros que serï¿½ utilizada para exibir o relatï¿½rio de LIDER de FACCAO
+-- Criando um Tipo para a tabela de registros que será utilizada para exibir o relatório do OFICIAL
+CREATE OR REPLACE TYPE tp_relatorio_tabela_oficial AS TABLE OF tp_relatorio_oficial;
+
+-- Criação do pacote do OFICIAL
+CREATE OR REPLACE PACKAGE pkg_oficial AS
+    FUNCTION relatorio_oficial(
+        p_oficial_id IN CHAR,
+        p_agrupamento IN VARCHAR2 DEFAULT NULL
+    ) RETURN tp_relatorio_tabela_oficial PIPELINED;
+END pkg_oficial;
+
+
+-- Corpo do pacote do OFICIAL
+CREATE OR REPLACE PACKAGE BODY pkg_oficial AS
+    FUNCTION relatorio_oficial(
+        p_oficial_id IN CHAR,
+        p_agrupamento IN VARCHAR2 DEFAULT NULL
+    ) RETURN tp_relatorio_tabela_oficial PIPELINED
+    IS
+        v_nacao_nome VARCHAR2(15);
+    BEGIN
+        -- Buscando o nome da NACAO do LIDER com o CPI informado
+        SELECT LIDER.NACAO
+        INTO v_nacao_nome
+        FROM LIDER
+        WHERE LIDER.CPI = p_oficial_id;
+
+        -- Verificando se a NACAO foi encontrada
+        IF v_nacao_nome IS NOT NULL THEN
+            -- Caso DEFAULT: informações sobre as comunidades da NACAO do LIDER
+            IF p_agrupamento IS NULL THEN
+                FOR rec IN (
+                    SELECT 
+                        C.NOME AS AGRUPAMENTO, 
+                        SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES,
+                        MIN(H.DATA_INI) AS DATA_INI,
+                        MAX(H.DATA_FIM) AS DATA_FIM
+                    FROM COMUNIDADE C
+                    JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+                    JOIN DOMINANCIA D ON H.PLANETA = D.PLANETA
+                    WHERE D.NACAO = v_nacao_nome
+                    GROUP BY C.NOME
+                ) LOOP
+                    PIPE ROW(tp_relatorio_oficial(rec.AGRUPAMENTO, NULL, rec.TOTAL_HABITANTES, rec.DATA_INI, rec.DATA_FIM));
+                END LOOP;
+
+            -- Agrupamento por FACCAO
+            ELSIF p_agrupamento = 'FACCAO' THEN
+                FOR rec IN (
+                    SELECT 
+                        P.FACCAO AS AGRUPAMENTO, 
+                        COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, 
+                        SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES,
+                        NULL AS DATA_INI,
+                        NULL AS DATA_FIM
+                    FROM COMUNIDADE C
+                    JOIN PARTICIPA P ON C.ESPECIE = P.ESPECIE AND C.NOME = P.COMUNIDADE
+                    JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+                    JOIN DOMINANCIA D ON H.PLANETA = D.PLANETA
+                    WHERE D.NACAO = v_nacao_nome
+                    GROUP BY P.FACCAO
+                ) LOOP
+                    PIPE ROW(tp_relatorio_oficial(rec.AGRUPAMENTO, rec.QTD_COMUNIDADES, rec.TOTAL_HABITANTES, rec.DATA_INI, rec.DATA_FIM));
+                END LOOP;
+
+            -- Agrupamento por ESPECIE
+            ELSIF p_agrupamento = 'ESPECIE' THEN
+                FOR rec IN (
+                    SELECT 
+                        C.ESPECIE AS AGRUPAMENTO, 
+                        COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, 
+                        SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES,
+                        NULL AS DATA_INI,
+                        NULL AS DATA_FIM
+                    FROM COMUNIDADE C
+                    JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+                    JOIN DOMINANCIA D ON H.PLANETA = D.PLANETA
+                    WHERE D.NACAO = v_nacao_nome
+                    GROUP BY C.ESPECIE
+                ) LOOP
+                    PIPE ROW(tp_relatorio_oficial(rec.AGRUPAMENTO, rec.QTD_COMUNIDADES, rec.TOTAL_HABITANTES, rec.DATA_INI, rec.DATA_FIM));
+                END LOOP;
+
+            -- Agrupamento por PLANETA
+            ELSIF p_agrupamento = 'PLANETA' THEN
+                FOR rec IN (
+                    SELECT 
+                        H.PLANETA AS AGRUPAMENTO, 
+                        COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, 
+                        SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES,
+                        NULL AS DATA_INI,
+                        NULL AS DATA_FIM
+                    FROM COMUNIDADE C
+                    JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+                    JOIN DOMINANCIA D ON H.PLANETA = D.PLANETA
+                    WHERE D.NACAO = v_nacao_nome
+                    GROUP BY H.PLANETA
+                ) LOOP
+                    PIPE ROW(tp_relatorio_oficial(rec.AGRUPAMENTO, rec.QTD_COMUNIDADES, rec.TOTAL_HABITANTES, rec.DATA_INI, rec.DATA_FIM));
+                END LOOP;
+
+            -- Agrupamento por SISTEMA
+            ELSIF p_agrupamento = 'SISTEMA' THEN
+                FOR rec IN (
+                    SELECT 
+                        S.NOME AS AGRUPAMENTO, 
+                        COUNT(DISTINCT C.NOME) AS QTD_COMUNIDADES, 
+                        SUM(C.QTD_HABITANTES) AS TOTAL_HABITANTES,
+                        NULL AS DATA_INI,
+                        NULL AS DATA_FIM
+                    FROM COMUNIDADE C
+                    JOIN HABITACAO H ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+                    JOIN ORBITA_PLANETA OP ON H.PLANETA = OP.PLANETA
+                    JOIN ESTRELA E ON OP.ESTRELA = E.ID_ESTRELA
+                    JOIN SISTEMA S ON E.ID_ESTRELA = S.ESTRELA
+                    JOIN DOMINANCIA D ON H.PLANETA = D.PLANETA
+                    WHERE D.NACAO = v_nacao_nome
+                    GROUP BY S.NOME
+                ) LOOP
+                    PIPE ROW(tp_relatorio_oficial(rec.AGRUPAMENTO, rec.QTD_COMUNIDADES, rec.TOTAL_HABITANTES, rec.DATA_INI, rec.DATA_FIM));
+                END LOOP;
+
+            ELSE
+                RETURN;
+            END IF;
+
+        ELSE
+            RETURN;
+        END IF;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RETURN;
+        WHEN OTHERS THEN
+            RETURN;
+    END;
+END pkg_oficial;
+
+
+
+
+
+-- Pacote do CIENTISTA --
+
+CREATE OR REPLACE TYPE tp_estrela AS OBJECT (
+    id_estrela VARCHAR2(50),
+    nome VARCHAR2(100),
+    classificacao VARCHAR2(50),
+    massa NUMBER,
+    x NUMBER,
+    y NUMBER,
+    z NUMBER
+);
+
+CREATE OR REPLACE TYPE tp_tabela_estrela AS TABLE OF tp_estrela;
+
+
+CREATE OR REPLACE TYPE tp_planeta AS OBJECT (
+    id_astro VARCHAR2(50),
+    raio NUMBER,
+    classificacao VARCHAR2(50),
+    massa NUMBER
+);
+
+CREATE OR REPLACE TYPE tp_tabela_planeta AS TABLE OF tp_planeta;
+
+
+CREATE OR REPLACE TYPE tp_sistema AS OBJECT (
+    estrela VARCHAR2(100),
+    nome VARCHAR2(100)
+);
+
+CREATE OR REPLACE TYPE tp_tabela_sistema AS TABLE OF tp_sistema;
+
+
+-- Definindo o pacote do CIENTISTA
+CREATE OR REPLACE PACKAGE PACOTE_CIENTISTA AS
+  PROCEDURE criar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  );
+
+  FUNCTION ler_estrela(
+    p_id_estrela IN VARCHAR2
+  ) RETURN  tp_tabela_estrela PIPELINED;
+
+  PROCEDURE atualizar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  );
+
+  PROCEDURE deletar_estrela(
+    p_id_estrela IN VARCHAR2
+  );
+
+
+-- relativo ao relatório
+  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED;
+  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED;
+  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED;
+
+END PACOTE_CIENTISTA;
+
+
+-- Corpo do pacote Cientista
+CREATE OR REPLACE PACKAGE BODY PACOTE_CIENTISTA AS
+
+  PROCEDURE criar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  ) IS
+  BEGIN
+    BEGIN
+      INSERT INTO ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z)
+      VALUES (p_id_estrela, p_nome, p_classificacao, p_massa, p_x, p_y, p_z);
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: Ja existe uma estrela com o ID ou coordenadas fornecidas.');
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END criar_estrela;
+
+  FUNCTION ler_estrela(
+    p_id_estrela IN VARCHAR2
+  ) RETURN  tp_tabela_estrela PIPELINED;
+    BEGIN
+    FOR rec IN (
+      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
+      FROM ESTRELA
+      WHERE ID_ESTRELA == p_id_estrela
+    ) LOOP
+      PIPE ROW(tp_estrela(
+        rec.ID_ESTRELA,
+        rec.NOME,
+        rec.CLASSIFICACAO,
+        rec.MASSA,
+        rec.X,
+        rec.Y,
+        rec.Z
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
+      RAISE;
+  END ler_estrela;
+
+
+
+  PROCEDURE atualizar_estrela(
+    p_id_estrela IN VARCHAR2,
+    p_nome IN VARCHAR2,
+    p_classificacao IN VARCHAR2,
+    p_massa IN NUMBER,
+    p_x IN NUMBER,
+    p_y IN NUMBER,
+    p_z IN NUMBER
+  ) IS
+  BEGIN
+    BEGIN
+      UPDATE ESTRELA
+      SET NOME = p_nome,
+          CLASSIFICACAO = p_classificacao,
+          MASSA = p_massa,
+          X = p_x,
+          Y = p_y,
+          Z = p_z
+      WHERE ID_ESTRELA = p_id_estrela;
+      
+      IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
+      END IF;
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: As coordenadas fornecidas ja est?o sendo utilizadas.');
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END atualizar_estrela;
+
+  PROCEDURE deletar_estrela(
+    p_id_estrela IN VARCHAR2
+  ) IS
+  BEGIN
+    BEGIN
+      DELETE FROM ESTRELA
+      WHERE ID_ESTRELA = p_id_estrela;
+      
+      IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END deletar_estrela;
+
+  -- Relativo ao relatório -------------------------------------------------------------
+
+  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
+      FROM ESTRELA
+      WHERE MASSA IS NULL
+    ) LOOP
+      PIPE ROW(tp_estrela(
+        rec.ID_ESTRELA,
+        rec.NOME,
+        rec.CLASSIFICACAO,
+        rec.MASSA,
+        rec.X,
+        rec.Y,
+        rec.Z
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
+      RAISE;
+  END obterEstrelas;
+  
+  
+  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ID_ASTRO, RAIO, CLASSIFICACAO, MASSA
+      FROM Planeta
+      WHERE MASSA IS NULL
+    ) LOOP
+      PIPE ROW(tp_planeta(
+        rec.ID_ASTRO,
+        rec.RAIO,
+        rec.CLASSIFICACAO,
+        rec.MASSA
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter planetas: ' || SQLERRM);
+      RAISE;
+  END obterPlanetas;
+  
+  
+  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED AS
+  BEGIN
+    FOR rec IN (
+      SELECT ESTRELA, NOME
+      FROM SISTEMA
+      WHERE NOME IS NULL
+    ) LOOP
+      PIPE ROW(tp_sistema(
+        rec.ESTRELA,
+        rec.NOME
+      ));
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('Erro ao obter sistemas: ' || SQLERRM);
+      RAISE;
+  END obterSistemas;
+
+END PACOTE_CIENTISTA;
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------
+-- Relatorio de Lider de Faccao --
+----------------------------------
+
+
+-- Criando um Tipo para exibir o relatorio de LIDER de FACCAO
+CREATE OR REPLACE TYPE tp_relatorio_lider_faccao AS OBJECT (
+    agrupamento VARCHAR2(100), -- Contem os itens distintos para o agrupamento escolhido.
+    especie VARCHAR2(100), -- Campo adicionado para o caso DEFAULT, onde queremos exibir a especie como informacao da comunidade. Substitui o campo "qtd_comunidades" no caso DEFAULT.
+    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregacao sendo definida.
+    total_habitantes NUMBER -- Agregado de total de habitantes na determinada comunidade ou na agregacao sendo definida.
+);
+
+-- Criando um Tipo para a tabela de registros que sera utilizada para exibir o relatorio de LIDER de FACCAO
 CREATE OR REPLACE TYPE tp_relatorio_tabela_lider_faccao AS TABLE OF tp_relatorio_lider_faccao;
 
--- Funï¿½ï¿½o para gerar o relatï¿½rio do LIDER de FACCAO
+-- Funcao para gerar o relatorio do LIDER de FACCAO
 CREATE OR REPLACE FUNCTION relatorio_lider_faccao(
     p_lider_id IN CHAR,
     p_agrupamento IN VARCHAR2 DEFAULT NULL
@@ -407,7 +692,7 @@ BEGIN
 
     -- Verificando se a FACCAO foi encontrada
     IF v_faccao_nome IS NOT NULL THEN
-        -- Caso DEFAULT: informaï¿½ï¿½es sobre as comunidades da FACCAO do LIDER
+        -- Caso DEFAULT: informacoes sobre as comunidades da FACCAO do LIDER
         IF p_agrupamento IS NULL THEN
             FOR rec IN (
                 SELECT C.NOME AS AGRUPAMENTO, C.ESPECIE AS ESPECIE, C.QTD_HABITANTES
@@ -489,260 +774,5 @@ EXCEPTION
 END;
 
 
--- Testes de chamada da funï¿½ï¿½o:
--- Caso DEFAULT
-SELECT agrupamento AS COMUNIDADE, especie, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98'));
-
--- Agrupamento por ESPECIE
-SELECT agrupamento AS ESPECIE, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'ESPECIE'));
-
--- Agrupamento por PLANETA
-SELECT agrupamento AS PLANETA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'PLANETA'));
-
--- Agrupamento por SISTEMA
-SELECT agrupamento AS SISTEMA, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'SISTEMA'));
-
--- Agrupamento por NACAO
-SELECT agrupamento AS NACAO, qtd_comunidades, total_habitantes FROM TABLE(relatorio_lider_faccao(p_lider_id => '999.999.999-98', p_agrupamento => 'NACAO'));
 
 
-
-
-
--- Criando o pacote de Cientistas
-CREATE OR REPLACE PACKAGE PACOTE_CIENTISTA AS
-  PROCEDURE criar_estrela(
-    p_id_estrela IN VARCHAR2,
-    p_nome IN VARCHAR2,
-    p_classificacao IN VARCHAR2,
-    p_massa IN NUMBER,
-    p_x IN NUMBER,
-    p_y IN NUMBER,
-    p_z IN NUMBER
-  );
-
-  FUNCTION ler_estrela(
-    p_id_estrela IN VARCHAR2
-  ) RETURN  tp_tabela_estrela PIPELINED;
-
-  PROCEDURE atualizar_estrela(
-    p_id_estrela IN VARCHAR2,
-    p_nome IN VARCHAR2,
-    p_classificacao IN VARCHAR2,
-    p_massa IN NUMBER,
-    p_x IN NUMBER,
-    p_y IN NUMBER,
-    p_z IN NUMBER
-  );
-
-  PROCEDURE deletar_estrela(
-    p_id_estrela IN VARCHAR2
-  );
-
-
--- relativo ao relatÃ³rio
-  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED;
-  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED;
-  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED;
-
-END PACOTE_CIENTISTA;
-
-
--- Corpo do pacote Cientista
-CREATE OR REPLACE PACKAGE BODY PACOTE_CIENTISTA AS
-
-  PROCEDURE criar_estrela(
-    p_id_estrela IN VARCHAR2,
-    p_nome IN VARCHAR2,
-    p_classificacao IN VARCHAR2,
-    p_massa IN NUMBER,
-    p_x IN NUMBER,
-    p_y IN NUMBER,
-    p_z IN NUMBER
-  ) IS
-  BEGIN
-    BEGIN
-      INSERT INTO ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z)
-      VALUES (p_id_estrela, p_nome, p_classificacao, p_massa, p_x, p_y, p_z);
-    EXCEPTION
-      WHEN DUP_VAL_ON_INDEX THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: Jï¿½ existe uma estrela com o ID ou coordenadas fornecidas.');
-      WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
-    END;
-  END criar_estrela;
-
-  FUNCTION ler_estrela(
-    p_id_estrela IN VARCHAR2
-  ) RETURN  tp_tabela_estrela PIPELINED;
-    BEGIN
-    FOR rec IN (
-      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
-      FROM ESTRELA
-      WHERE ID_ESTRELA == p_id_estrela
-    ) LOOP
-      PIPE ROW(tp_estrela(
-        rec.ID_ESTRELA,
-        rec.NOME,
-        rec.CLASSIFICACAO,
-        rec.MASSA,
-        rec.X,
-        rec.Y,
-        rec.Z
-      ));
-    END LOOP;
-  EXCEPTION
-    WHEN OTHERS THEN
-      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
-      RAISE;
-  END ler_estrela;
-
-
-
-
-  PROCEDURE atualizar_estrela(
-    p_id_estrela IN VARCHAR2,
-    p_nome IN VARCHAR2,
-    p_classificacao IN VARCHAR2,
-    p_massa IN NUMBER,
-    p_x IN NUMBER,
-    p_y IN NUMBER,
-    p_z IN NUMBER
-  ) IS
-  BEGIN
-    BEGIN
-      UPDATE ESTRELA
-      SET NOME = p_nome,
-          CLASSIFICACAO = p_classificacao,
-          MASSA = p_massa,
-          X = p_x,
-          Y = p_y,
-          Z = p_z
-      WHERE ID_ESTRELA = p_id_estrela;
-      
-      IF SQL%ROWCOUNT = 0 THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
-      END IF;
-    EXCEPTION
-      WHEN DUP_VAL_ON_INDEX THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: As coordenadas fornecidas jï¿½ estï¿½o sendo utilizadas.');
-      WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
-    END;
-  END atualizar_estrela;
-
-  PROCEDURE deletar_estrela(
-    p_id_estrela IN VARCHAR2
-  ) IS
-  BEGIN
-    BEGIN
-      DELETE FROM ESTRELA
-      WHERE ID_ESTRELA = p_id_estrela;
-      
-      IF SQL%ROWCOUNT = 0 THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: Nenhuma estrela encontrada com o ID fornecido.');
-      END IF;
-    EXCEPTION
-      WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
-    END;
-  END deletar_estrela;
-
-  -- Relativo ao relatÃ³rio -------------------------------------------------------------
-
-  FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED AS
-  BEGIN
-    FOR rec IN (
-      SELECT ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z
-      FROM ESTRELA
-      WHERE MASSA IS NULL
-    ) LOOP
-      PIPE ROW(tp_estrela(
-        rec.ID_ESTRELA,
-        rec.NOME,
-        rec.CLASSIFICACAO,
-        rec.MASSA,
-        rec.X,
-        rec.Y,
-        rec.Z
-      ));
-    END LOOP;
-  EXCEPTION
-    WHEN OTHERS THEN
-      DBMS_OUTPUT.PUT_LINE('Erro ao obter estrelas: ' || SQLERRM);
-      RAISE;
-  END obterEstrelas;
-  
-  
-  FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED AS
-  BEGIN
-    FOR rec IN (
-      SELECT ID_ASTRO, RAIO, CLASSIFICACAO, MASSA
-      FROM Planeta
-      WHERE MASSA IS NULL
-    ) LOOP
-      PIPE ROW(tp_planeta(
-        rec.ID_ASTRO,
-        rec.RAIO,
-        rec.CLASSIFICACAO,
-        rec.MASSA
-      ));
-    END LOOP;
-  EXCEPTION
-    WHEN OTHERS THEN
-      DBMS_OUTPUT.PUT_LINE('Erro ao obter planetas: ' || SQLERRM);
-      RAISE;
-  END obterPlanetas;
-  
-  
-  FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED AS
-  BEGIN
-    FOR rec IN (
-      SELECT ESTRELA, NOME
-      FROM SISTEMA
-      WHERE NOME IS NULL
-    ) LOOP
-      PIPE ROW(tp_sistema(
-        rec.ESTRELA,
-        rec.NOME
-      ));
-    END LOOP;
-  EXCEPTION
-    WHEN OTHERS THEN
-      DBMS_OUTPUT.PUT_LINE('Erro ao obter sistemas: ' || SQLERRM);
-      RAISE;
-  END obterSistemas;
-
-END PACOTE_CIENTISTA;
-
-
-
-
-CREATE OR REPLACE TYPE tp_estrela AS OBJECT (
-    id_estrela VARCHAR2(50),
-    nome VARCHAR2(100),
-    classificacao VARCHAR2(50),
-    massa NUMBER,
-    x NUMBER,
-    y NUMBER,
-    z NUMBER
-);
-
-CREATE OR REPLACE TYPE tp_tabela_estrela AS TABLE OF tp_estrela;
-
-
-CREATE OR REPLACE TYPE tp_planeta AS OBJECT (
-    id_astro VARCHAR2(50),
-    raio NUMBER,
-    classificacao VARCHAR2(50),
-    massa NUMBER
-);
-
-CREATE OR REPLACE TYPE tp_tabela_planeta AS TABLE OF tp_planeta;
-  
-CREATE OR REPLACE TYPE tp_sistema AS OBJECT (
-    estrela VARCHAR2(100),
-    nome VARCHAR2(100)
-);
-
-CREATE OR REPLACE TYPE tp_tabela_sistema AS TABLE OF tp_sistema;

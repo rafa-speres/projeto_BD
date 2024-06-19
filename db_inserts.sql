@@ -51,6 +51,12 @@ INSERT INTO FACCAO VALUES ('Faccao_Claquete', '888.482.444-10', 'PROGRESSITA', 0
 COMMIT;
 
 
+-- Remover FACCAO de NACAO:
+INSERT INTO LIDER VALUES ('555.452.444-10', 'Roger', 'OFICIAL', 'Sit saepe ad.', 'Amet id');
+INSERT INTO NACAO VALUES('Sit saepe ad.', 0, 'Totam amet.');
+INSERT INTO FACCAO VALUES('Faccao_Caballo', '555.452.444-10', 'PROGRESSITA', 1);
+INSERT INTO NACAO_FACCAO VALUES ('Sit saepe ad.', 'Faccao_Caballo');
+
 --------------------------------------------------------
 -- Inserts para testar o Relatório do Líder de Facção -- 
 --------------------------------------------------------
