@@ -2,6 +2,99 @@ import customtkinter as ctk
 from tkinter import messagebox
 from database import conectar_bd
 
+def incluir_nacao(usuario, federacao):
+    federacao = federacao.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    result = cursor.fetchone()
+    if result:
+        nacao = result[0]
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    pkg_comandante.incluir_nacao_em_federacao(p_user_id => '{usuario}', p_nacao => '{nacao}', p_federacao => '{federacao}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Nação incluida!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao incluir nação: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+        
+def excluir_nacao(usuario, federacao):
+    federacao = federacao.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    result = cursor.fetchone()
+    if result:
+        nacao = result[0]
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    pkg_comandante.excluir_nacao_de_federacao(p_user_id => '{usuario}', p_nacao => '{nacao}', p_federacao => '{federacao}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Nação excluida da federacao!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao excluir nacao da federacao: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+        
+def criar_federacao(usuario, federacao):
+    federacao = federacao.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    result = cursor.fetchone()
+    if result:
+        nacao = result[0]
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    pkg_comandante.criar_federacao_com_nacao(p_federacao => '{federacao}', p_user_id => '{usuario}', p_nacao => '{nacao}',p_data_fund => SYSDATE);
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Federação criada")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao criar federacao: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+            
+def inserir_dominancia(usuario, planeta):
+    federacao = federacao.get()
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT NACAO FROM LIDER WHERE CPI = {usuario}")
+    result = cursor.fetchone()
+    if result:
+        nacao = result[0]
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    pkg_comandante.inserir_dominancia(p_planeta => '{planeta}', p_nacao => '{nacao}', p_data_ini => SYSDATE);
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Dominancia inserida!")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao inserir dominancia: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+
+
 def alterar_nome_faccao(faccao, nova_faccao):
     nova_faccao = nova_faccao.get()
     conn = conectar_bd()
@@ -132,8 +225,65 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios de líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)
         botao_ver_relatorios_lider.pack(pady=10)
     
+    #inluir a sua nação em uma federacao
+    label_incluir = ctk.CTkLabel(frame_overview_comandante, text="Incluir a sua nação em uma federacao")
+    label_incluir.pack(pady=(10, 0))
+    
+    #federacao
+    label_federacao = ctk.CTkLabel(frame_overview_comandante, text="Federação")
+    label_federacao.pack(pady=(10, 0))
+    entrada_federacao = ctk.CTkEntry(frame_overview_comandante)
+    entrada_federacao.pack(pady=(0, 10))
+    
+    #botao para incluir nacao
+    botao_incluir_nacao = ctk.CTkButton(frame_overview_comandante, text="Incluir", command=lambda: incluir_nacao(usuario, entrada_federacao), width=400, height=40)
+    botao_incluir_nacao.pack(pady=10)
+    
+    #excluir a sua nação em uma federacao
+    label_excluir = ctk.CTkLabel(frame_overview_comandante, text="Excluir a sua nação da federação")
+    label_excluir.pack(pady=(10, 0))
+    
+    #federacao
+    label_federacao_e = ctk.CTkLabel(frame_overview_comandante, text="Federação")
+    label_federacao_e.pack(pady=(10, 0))
+    entrada_federacao_e = ctk.CTkEntry(frame_overview_comandante)
+    entrada_federacao_e.pack(pady=(0, 10))
+    
+    #botao para excluir nacao
+    botao_incluir_nacao = ctk.CTkButton(frame_overview_comandante, text="Excluir", command=lambda: excluir_nacao(usuario, entrada_federacao_e), width=400, height=40)
+    botao_incluir_nacao.pack(pady=10)
+    
+    #criar federacao com a nacao
+    label_criar = ctk.CTkLabel(frame_overview_comandante, text="Criar federação com a nação")
+    label_criar.pack(pady=(10, 0))
+    
+    #federacao
+    label_federacao_c = ctk.CTkLabel(frame_overview_comandante, text="Federação")
+    label_federacao_c.pack(pady=(10, 0))
+    entrada_federacao_c = ctk.CTkEntry(frame_overview_comandante)
+    entrada_federacao_c.pack(pady=(0, 10))
+    
+    #botao para criar federacao
+    botao_criar_federacao = ctk.CTkButton(frame_overview_comandante, text="Criar", command=lambda: criar_federacao(usuario, entrada_federacao_c), width=400, height=40)
+    botao_criar_federacao.pack(pady=10)
+    
+    #inserir nova dominancia de planeta
+    label_criar = ctk.CTkLabel(frame_overview_comandante, text="Inserir nova dominancia de planeta")
+    label_criar.pack(pady=(10, 0))
+    
+    #planeta
+    label_planeta = ctk.CTkLabel(frame_overview_comandante, text="Planeta")
+    label_planeta.pack(pady=(10, 0))
+    entrada_planeta = ctk.CTkEntry(frame_overview_comandante)
+    entrada_planeta.pack(pady=(0, 10))
+    
+    #botao para criar federacao
+    botao_inserir_dominancia = ctk.CTkButton(frame_overview_comandante, text="Inserir dominancia", command=lambda: criar_federacao(usuario, entrada_federacao_c), width=400, height=40)
+    botao_inserir_dominancia.pack(pady=10)
+    
+    
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao[0]), width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao[0], tipo_usuario), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login

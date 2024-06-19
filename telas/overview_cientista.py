@@ -2,6 +2,78 @@ import customtkinter as ctk
 from tkinter import messagebox
 from database import conectar_bd
 
+def criar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
+    id_estrela = id_estrela.get()
+    nome = nome.get()
+    massa = massa.get()
+    classificacao = classificacao.get()
+    cX = cX.get()
+    cY = cY.get()
+    cZ = cZ.get()
+    
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PACOTE_CIENTISTA.criar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Estrela criada!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao criar estrela: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+        
+def deletar_estrela(id_estrela):
+    id_estrela = id_estrela.get()
+    
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PACOTE_CIENTISTA.deletar_estrela('{id_estrela}');
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Estrela excluida!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao excluir estrela: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+        
+def atualizar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
+    id_estrela = id_estrela.get()
+    nome = nome.get()
+    massa = massa.get()
+    classificacao = classificacao.get()
+    cX = cX.get()
+    cY = cY.get()
+    cZ = cZ.get()
+    
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+            BEGIN
+                PACOTE_CIENTISTA.atualizar_estrela('{id_estrela}', '{nome}', '{classificacao}', {massa}, {cX}, {cY}, {cZ});
+            END;
+        """)
+        conn.commit()
+        messagebox.showinfo("Sucesso", "Estrela atualizada!")
+    except Exception as e:
+        conn.rollback()
+        messagebox.showerror("Erro", f"Falha ao atualizar estrela: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
 def alterar_nome_faccao(faccao, nova_faccao):
     nova_faccao = nova_faccao.get()
     conn = conectar_bd()
@@ -135,39 +207,110 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar
     # Adicionar Estrela
     label_adicionar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Adicionar Estrela", font=("Arial", 18))
     label_adicionar_estrela.pack(pady=10)
-    entry_adicionar_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
-    entry_adicionar_estrela.pack(pady=5)
-    label_entry_adicionar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Estrela")
-    label_entry_adicionar_estrela.pack(pady=5)
-    botao_adicionar_estrela = ctk.CTkButton(frame_overview_cientista, text="Adicionar", width=400)
+    
+    label_entry_adicionar_id_estrela = ctk.CTkLabel(frame_overview_cientista, text="ID Estrela")
+    label_entry_adicionar_id_estrela.pack(pady=5)
+    entry_adicionar_estrela_id = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_id.pack(pady=5)
+    
+    label_entry_adicionar_nome_estrela = ctk.CTkLabel(frame_overview_cientista, text="Nome da Estrela")
+    label_entry_adicionar_nome_estrela.pack(pady=5)
+    entry_adicionar_estrela_nome = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_nome.pack(pady=5)
+    
+    label_entry_adicionar_classificacao_estrela = ctk.CTkLabel(frame_overview_cientista, text="Classificação")
+    label_entry_adicionar_classificacao_estrela.pack(pady=5)
+    entry_adicionar_estrela_classificacao = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_classificacao.pack(pady=5)
+    
+    label_entry_adicionar_massa_estrela = ctk.CTkLabel(frame_overview_cientista, text="Massa")
+    label_entry_adicionar_massa_estrela.pack(pady=5)
+    entry_adicionar_estrela_massa = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_massa.pack(pady=5)
+    
+    label_entry_adicionar_coordenadaX_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada X")
+    label_entry_adicionar_coordenadaX_estrela.pack(pady=5)
+    entry_adicionar_estrela_coordenadaX = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_coordenadaX.pack(pady=5)
+    
+    label_entry_adicionar_coordenadaY_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada Y")
+    label_entry_adicionar_coordenadaY_estrela.pack(pady=5)
+    entry_adicionar_estrela_coordenadaY = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_coordenadaY.pack(pady=5)
+    
+    label_entry_adicionar_coordenadaZ_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada Z")
+    label_entry_adicionar_coordenadaZ_estrela.pack(pady=5)
+    entry_adicionar_estrela_coordenadaZ = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_adicionar_estrela_coordenadaZ.pack(pady=5)
+    
+    botao_adicionar_estrela = ctk.CTkButton(frame_overview_cientista, text="Adicionar", command=lambda: criar_estrela(entry_adicionar_estrela_id, entry_adicionar_estrela_nome, entry_adicionar_estrela_massa, entry_adicionar_estrela_classificacao, entry_adicionar_estrela_coordenadaX, entry_adicionar_estrela_coordenadaY, entry_adicionar_estrela_coordenadaZ) , width=400)
     botao_adicionar_estrela.pack(pady=5)
     
     # Remover Estrela
     label_remover_estrela = ctk.CTkLabel(frame_overview_cientista, text="Remover Estrela", font=("Arial", 18))
     label_remover_estrela.pack(pady=10)
-    entry_remover_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
-    entry_remover_estrela.pack(pady=5)
-    label_entry_remover_estrela = ctk.CTkLabel(frame_overview_cientista, text="Estrela")
+    
+    label_entry_remover_estrela = ctk.CTkLabel(frame_overview_cientista, text="Id da Estrela")
     label_entry_remover_estrela.pack(pady=5)
-    botao_remover_estrela = ctk.CTkButton(frame_overview_cientista, text="Remover", width=400)
+    
+    entry_remover_estrela_id = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_remover_estrela_id.pack(pady=5)
+    
+    botao_remover_estrela = ctk.CTkButton(frame_overview_cientista, text="Remover", command=lambda: deletar_estrela(entry_remover_estrela_id), width=400)
     botao_remover_estrela.pack(pady=5)
     
-    # Editar Estrela
-    label_editar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Editar Estrela", font=("Arial", 18))
-    label_editar_estrela.pack(pady=10)
-    entry_nome_atual_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
-    entry_nome_atual_estrela.pack(pady=5)
-    label_nome_atual_estrela = ctk.CTkLabel(frame_overview_cientista, text="Nome Atual da Estrela")
-    label_nome_atual_estrela.pack(pady=5)
-    entry_novo_nome_estrela = ctk.CTkEntry(frame_overview_cientista, width=400)
-    entry_novo_nome_estrela.pack(pady=5)
-    label_novo_nome_estrela = ctk.CTkLabel(frame_overview_cientista, text="Novo Nome da Estrela")
-    label_novo_nome_estrela.pack(pady=5)
-    botao_editar_estrela = ctk.CTkButton(frame_overview_cientista, text="Editar", width=400)
-    botao_editar_estrela.pack(pady=5)
+    # Atualizar Estrela
+    label_atualizar_estrela = ctk.CTkLabel(frame_overview_cientista, text="Editar Estrela", font=("Arial", 18))
+    label_atualizar_estrela.pack(pady=10)
+    
+    label_entry_atualizar_id_estrela = ctk.CTkLabel(frame_overview_cientista, text="ID Estrela")
+    label_entry_atualizar_id_estrela.pack(pady=5)
+    entry_atualizar_estrela_id = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_id.pack(pady=5)
+    
+    label_entry_atualizar_nome_estrela = ctk.CTkLabel(frame_overview_cientista, text="Nome da Estrela")
+    label_entry_atualizar_nome_estrela.pack(pady=5)
+    entry_atualizar_estrela_nome = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_nome.pack(pady=5)
+    
+    label_entry_atualizar_classificacao_estrela = ctk.CTkLabel(frame_overview_cientista, text="Classificação")
+    label_entry_atualizar_classificacao_estrela.pack(pady=5)
+    entry_atualizar_estrela_classificacao = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_classificacao.pack(pady=5)
+    
+    label_entry_atualizar_massa_estrela = ctk.CTkLabel(frame_overview_cientista, text="Massa")
+    label_entry_atualizar_massa_estrela.pack(pady=5)
+    entry_atualizar_estrela_massa = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_massa.pack(pady=5)
+    
+    label_entry_atualizar_coordenadaX_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada X")
+    label_entry_atualizar_coordenadaX_estrela.pack(pady=5)
+    entry_atualizar_estrela_coordenadaX = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_coordenadaX.pack(pady=5)
+    
+    label_entry_atualizar_coordenadaY_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada Y")
+    label_entry_atualizar_coordenadaY_estrela.pack(pady=5)
+    entry_atualizar_estrela_coordenadaY = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_coordenadaY.pack(pady=5)
+    
+    label_entry_atualizar_coordenadaZ_estrela = ctk.CTkLabel(frame_overview_cientista, text="Coordenada Z")
+    label_entry_atualizar_coordenadaZ_estrela.pack(pady=5)
+    entry_atualizar_estrela_coordenadaZ = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_atualizar_estrela_coordenadaZ.pack(pady=5)
+    
+    
+    botao_atualizar_estrela = ctk.CTkButton(frame_overview_cientista, text="Atualizar", command=lambda: atualizar_estrela(entry_atualizar_estrela_id, entry_atualizar_estrela_nome, entry_atualizar_estrela_massa, entry_atualizar_estrela_classificacao, entry_atualizar_estrela_coordenadaX, entry_atualizar_estrela_coordenadaY, entry_atualizar_estrela_coordenadaZ), width=400)
+    botao_atualizar_estrela.pack(pady=5)
+    
+    #para exposicao da estrela (CRUD)
+    label_entry_estrela_read = ctk.CTkLabel(frame_overview_cientista, text="Estrela para Ler")
+    label_entry_estrela_read.pack(pady=5)
+    entry_estrela_read = ctk.CTkEntry(frame_overview_cientista, width=400)
+    entry_estrela_read.pack(pady=5)
+    
     
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_cientista, text="Ver Relatórios", command=lambda: mostrar_relatorio_cientista(usuario, faccao[0]), width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_cientista, text="Ver Relatórios", command=lambda: mostrar_relatorio_cientista(usuario, faccao[0], tipo_usuario, entry_estrela_read.get()), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login

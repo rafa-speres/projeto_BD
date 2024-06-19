@@ -36,9 +36,9 @@ def mostrar_tela_oficial(usuario, faccao, mostrar_relatorio_oficial, mostrar_rel
     frame_tela_oficial = criar_overview_oficial(app, mostrar_tela_login, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial)
     frame_tela_oficial.pack(pady=20)
     
-def mostrar_relatorio_cientista(usuario,faccao, tipo_usuario):
+def mostrar_relatorio_cientista(usuario,faccao, tipo_usuario, id_estrela):
     esconder_todas_as_telas()
-    frame_relatorio_cientista = criar_relatorio_cientista(app, mostrar_tela_login, usuario, faccao, mostrar_tela_cientista, mostrar_relatorio_cientista, mostrar_relatorio_lider,tipo_usuario) 
+    frame_relatorio_cientista = criar_relatorio_cientista(app, mostrar_tela_login, usuario, faccao, mostrar_tela_cientista, mostrar_relatorio_cientista, mostrar_relatorio_lider,tipo_usuario, id_estrela) 
     frame_relatorio_cientista.pack(pady=20)
     
 def mostrar_relatorio_comandante(usuario,faccao, tipo_usuario):
