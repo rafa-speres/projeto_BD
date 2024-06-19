@@ -75,7 +75,7 @@ def credenciar_comunidades(faccao, especie, comunidade):
             messagebox.showinfo("Sucesso", "Comunidade credenciada!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+            messagebox.showerror("Erro", f"Falha ao credenciar")
         finally:
             cursor.close()
             conn.close()
