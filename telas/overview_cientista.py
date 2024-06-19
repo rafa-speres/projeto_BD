@@ -234,13 +234,13 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar
         entrada_especie.pack(pady=(0, 10))
 
         # Nome da comunidade
-        label_nome_comunidade = ctk.CTkLabel(frame_overview_cientista, text="Comunidade")
+        label_nome_comunidade = ctk.CTkLabel(frame_overview_cientista, text="Nova Comunidade")
         label_nome_comunidade.pack(pady=(10, 0))
         entrada_nome_comunidade = ctk.CTkEntry(frame_overview_cientista)
         entrada_nome_comunidade.pack(pady=(0, 10))
 
         # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_cientista, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_cientista, text="Credenciar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
         
         label_operacao_a4 = ctk.CTkLabel(frame_overview_cientista, text="Remover nação da facção", font=("Arial", 18))

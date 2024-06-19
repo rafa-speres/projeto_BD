@@ -266,13 +266,13 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
         entrada_especie.pack(pady=(0, 10))
 
         # Nome da comunidade
-        label_nome_comunidade = ctk.CTkLabel(frame_overview_comandante, text="Comunidade")
+        label_nome_comunidade = ctk.CTkLabel(frame_overview_comandante, text="Nome Comunidade")
         label_nome_comunidade.pack(pady=(10, 0))
         entrada_nome_comunidade = ctk.CTkEntry(frame_overview_comandante)
         entrada_nome_comunidade.pack(pady=(0, 10))
 
         # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_comandante, text="Credenciar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
         
         # Botão para atualizar dados da comunidade

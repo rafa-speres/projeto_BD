@@ -75,7 +75,7 @@ def credenciar_comunidades(faccao, especie, comunidade):
             messagebox.showinfo("Sucesso", "Comunidade credenciada!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao credenciar")
+            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
         finally:
             cursor.close()
             conn.close()
@@ -152,18 +152,15 @@ def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_r
         entrada_especie.pack(pady=(0, 10))
 
         # Nome da comunidade
-        label_nome_comunidade = ctk.CTkLabel(frame_overview_oficial, text="Comunidade")
+        label_nome_comunidade = ctk.CTkLabel(frame_overview_oficial, text="Nova Comunidade")
         label_nome_comunidade.pack(pady=(10, 0))
         entrada_nome_comunidade = ctk.CTkEntry(frame_overview_oficial)
         entrada_nome_comunidade.pack(pady=(0, 10))
 
         # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Credenciar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
         
-        # Botão para atualizar dados da comunidade
-        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
-        botao_atualizar_comunidade.pack(pady=10)
         
         label_operacao_a4 = ctk.CTkLabel(frame_overview_oficial, text="Remover nação da facção", font=("Arial", 18))
         label_operacao_a4.pack(pady=10)
