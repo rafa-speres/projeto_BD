@@ -47,15 +47,24 @@ COMMIT;
 -- Inserts para testar as Funcionalidades do Líder de Facção -- 
 ---------------------------------------------------------------
 
-INSERT INTO FACCAO VALUES ('Faccao_Claquete', '888.482.444-10', 'PROGRESSITA', 0);
-COMMIT;
 
+INSERT INTO FEDERACAO VALUES ('Fed_Cerdo', SYSDATE);
+INSERT INTO NACAO VALUES('Nacao_Manzana', 2, 'Fed_Cerdo');
+
+-- Indicar novo LIDER:
+INSERT INTO LIDER VALUES ('888.482.444-10', 'Gersson', 'COMANDANTE', 'Nacao_Manzana', 'Amet id');
+				
+INSERT INTO FACCAO VALUES ('Faccao_Claquete', '888.482.444-10', 'PROGRESSITA', 0);
+
+INSERT INTO LIDER VALUES ('123.456.789-10', 'Robson', 'OFICIAL', 'Facilis illo.', 'Illo fugit');
+COMMIT;
 
 -- Remover FACCAO de NACAO:
 INSERT INTO LIDER VALUES ('555.452.444-10', 'Roger', 'OFICIAL', 'Sit saepe ad.', 'Amet id');
 INSERT INTO NACAO VALUES('Sit saepe ad.', 0, 'Totam amet.');
 INSERT INTO FACCAO VALUES('Faccao_Caballo', '555.452.444-10', 'PROGRESSITA', 1);
 INSERT INTO NACAO_FACCAO VALUES ('Sit saepe ad.', 'Faccao_Caballo');
+COMMIT;
 
 --------------------------------------------------------
 -- Inserts para testar o Relatório do Líder de Facção -- 
