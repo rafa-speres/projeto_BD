@@ -58,7 +58,6 @@ def atualizar_pagina(faccao,novo_lider,app, mostrar_tela_inicial, usuario, mostr
         widget.pack_forget()
     criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial)
 
-
 def credenciar_comunidades(faccao, especie, comunidade):
     especie = especie.get()
     comunidade = comunidade.get()
@@ -76,12 +75,35 @@ def credenciar_comunidades(faccao, especie, comunidade):
             messagebox.showinfo("Sucesso", "Comunidade credenciada!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+            messagebox.showerror("Erro", f"Falha ao credenciar")
         finally:
             cursor.close()
             conn.close()
     else:
-        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")  
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
+
+def remover_nacao_faccao(faccao, nacao):
+    nacao = nacao.get()
+    
+    if nacao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.RemoverFaccaoDeNacao('{nacao}', '{faccao[0]}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Relação removida")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao remover")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
 
 def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_relatorio_oficial, mostrar_relatorio_lider, mostrar_tela_oficial):
     if not isinstance(faccao, list):
@@ -138,6 +160,22 @@ def criar_overview_oficial(app, mostrar_tela_inicial, usuario, faccao, mostrar_r
         # Botão para atualizar dados da comunidade
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
+        
+        # Botão para atualizar dados da comunidade
+        botao_atualizar_comunidade = ctk.CTkButton(frame_overview_oficial, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
+        botao_atualizar_comunidade.pack(pady=10)
+        
+        label_operacao_a4 = ctk.CTkLabel(frame_overview_oficial, text="Remover nação da facção", font=("Arial", 18))
+        label_operacao_a4.pack(pady=10)
+        
+        # Nome da nacao
+        label_nome_nac = ctk.CTkLabel(frame_overview_oficial, text="Nação")
+        label_nome_nac.pack(pady=(10, 0))
+        entrada_nome_nac = ctk.CTkEntry(frame_overview_oficial)
+        entrada_nome_nac.pack(pady=(0, 10))
+        
+        botao_remover_nacao = ctk.CTkButton(frame_overview_oficial, text="Remover Nação", command=lambda: remover_nacao_faccao(faccao, entrada_nome_nac), width=400, height=40)
+        botao_remover_nacao.pack(pady=10)
         
         # Botão para ver relatórios de líder
         botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_oficial, text="Ver Relatórios de líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)

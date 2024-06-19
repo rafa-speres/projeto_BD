@@ -48,7 +48,7 @@ def deletar_estrela(id_estrela):
             messagebox.showinfo("Sucesso", "Estrela excluida!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao excluir estrela: {e}")
+            messagebox.showerror("Erro", f"Falha ao excluir estrela")
         finally:
             cursor.close()
             conn.close()
@@ -77,7 +77,7 @@ def atualizar_estrela(id_estrela, nome, massa, classificacao, cX, cY, cZ):
             messagebox.showinfo("Sucesso", "Estrela atualizada!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao atualizar estrela: {e}")
+            messagebox.showerror("Erro", f"Falha ao atualizar estrela")
         finally:
             cursor.close()
             conn.close()
@@ -99,7 +99,7 @@ def alterar_nome_faccao(faccao, nova_faccao):
             messagebox.showinfo("Sucesso", "Nome de facção alterado!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao alterar nome da facção: {e}")
+            messagebox.showerror("Erro", f"Falha ao alterar nome da facção")
         finally:
             cursor.close()
             conn.close()
@@ -123,7 +123,7 @@ def alterar_lider(faccao, novo_lider):
             messagebox.showinfo("Sucesso", "Lider alterado!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao alterar lider: {e}")
+            messagebox.showerror("Erro", f"Falha ao alterar lider")
             check = 1
         finally:
             cursor.close()
@@ -156,7 +156,30 @@ def credenciar_comunidades(faccao, especie, comunidade):
             messagebox.showinfo("Sucesso", "Comunidade credenciada!")
         except Exception as e:
             conn.rollback()
-            messagebox.showerror("Erro", f"Falha ao credenciar: {e}")
+            messagebox.showerror("Erro", f"Falha ao credenciar")
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
+        
+def remover_nacao_faccao(faccao, nacao):
+    nacao = nacao.get()
+    
+    if nacao:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"""
+                BEGIN
+                    PacoteLiderFaccao.RemoverFaccaoDeNacao('{nacao}', '{faccao[0]}');
+                END;
+            """)
+            conn.commit()
+            messagebox.showinfo("Sucesso", "Relação removida")
+        except Exception as e:
+            conn.rollback()
+            messagebox.showerror("Erro", f"Falha ao remover")
         finally:
             cursor.close()
             conn.close()
@@ -219,6 +242,18 @@ def criar_overview_cientista(app, mostrar_tela_inicial, usuario, faccao, mostrar
         # Botão para atualizar dados da comunidade
         botao_atualizar_comunidade = ctk.CTkButton(frame_overview_cientista, text="Atualizar Comunidade", command=lambda: credenciar_comunidades(faccao, entrada_especie, entrada_nome_comunidade), width=400, height=40)
         botao_atualizar_comunidade.pack(pady=10)
+        
+        label_operacao_a4 = ctk.CTkLabel(frame_overview_cientista, text="Remover nação da facção", font=("Arial", 18))
+        label_operacao_a4.pack(pady=10)
+        
+        # Nome da nacao
+        label_nome_nac = ctk.CTkLabel(frame_overview_cientista, text="Nação")
+        label_nome_nac.pack(pady=(10, 0))
+        entrada_nome_nac = ctk.CTkEntry(frame_overview_cientista)
+        entrada_nome_nac.pack(pady=(0, 10))
+        
+        botao_remover_nacao = ctk.CTkButton(frame_overview_cientista, text="Remover Nação", command=lambda: remover_nacao_faccao(faccao, entrada_nome_nac), width=400, height=40)
+        botao_remover_nacao.pack(pady=10)
         
         # Botão para ver relatórios de líder
         botao_ver_relatorios_lider = ctk.CTkButton(frame_overview_cientista, text="Ver Relatórios de líder", command=lambda: mostrar_relatorio_lider(usuario, faccao, tipo_usuario), width=400, height=40)
