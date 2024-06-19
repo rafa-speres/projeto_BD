@@ -416,6 +416,135 @@ END pkg_oficial;
 
 
 
+-- Pacote do COMANDANTE --
+
+
+-- Definindo o pacote do COMANDANTE
+CREATE OR REPLACE PACKAGE pkg_comandante AS
+    PROCEDURE incluir_nacao_em_federacao(p_user_id CHAR, p_nacao VARCHAR2, p_federacao VARCHAR2);
+    PROCEDURE excluir_nacao_de_federacao(p_user_id CHAR, p_nacao VARCHAR2, p_federacao VARCHAR2);
+    PROCEDURE criar_federacao_com_nacao(p_federacao VARCHAR2, p_user_id CHAR, p_nacao VARCHAR2, p_data_fund DATE);
+    PROCEDURE inserir_dominancia(p_planeta VARCHAR2, p_nacao VARCHAR2, p_data_ini DATE);
+END pkg_comandante;
+
+
+-- Corpo do pacote do COMANDANTE
+CREATE OR REPLACE PACKAGE BODY pkg_comandante AS
+
+    PROCEDURE incluir_nacao_em_federacao(p_user_id CHAR, p_nacao VARCHAR2, p_federacao VARCHAR2) IS
+        v_nacao VARCHAR2(15);
+    BEGIN
+        -- Obter a NACAO do LIDER logado
+        SELECT NACAO INTO v_nacao
+        FROM LIDER
+        WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
+
+        -- Verificar se a nação inserida e a mesma do lider logado
+        IF v_nacao = p_nacao THEN
+            UPDATE NACAO
+            SET FEDERACAO = p_federacao
+            WHERE NOME = v_nacao;
+            IF SQL%ROWCOUNT = 0 THEN
+                DBMS_OUTPUT.PUT_LINE('Nenhuma linha atualizada. Verifique os dados.');
+            ELSE
+                COMMIT;
+                DBMS_OUTPUT.PUT_LINE('Nacao ' || v_nacao || ' foi incluida na federacao ' || p_federacao);
+            END IF;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Erro: Você só pode modificar a sua propria nação.');
+        END IF;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Nacao ou federacao nao encontrada.');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao incluir nação em federacao: ' || SQLERRM);
+            RAISE;
+    END incluir_nacao_em_federacao;
+
+    PROCEDURE excluir_nacao_de_federacao(p_user_id CHAR, p_nacao VARCHAR2, p_federacao VARCHAR2) IS
+        v_nacao VARCHAR2(15);
+    BEGIN
+        -- Obter a nação do líder logado
+        SELECT NACAO INTO v_nacao
+        FROM LIDER
+        WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
+
+        -- Verificar se a nação inserida e a mesma do LIDER logado
+        IF v_nacao = p_nacao THEN
+            UPDATE NACAO
+            SET FEDERACAO = NULL
+            WHERE NOME = v_nacao AND FEDERACAO = p_federacao;
+            IF SQL%ROWCOUNT = 0 THEN
+                DBMS_OUTPUT.PUT_LINE('Nenhuma linha atualizada. Verifique os dados.');
+            ELSE
+                COMMIT;
+                DBMS_OUTPUT.PUT_LINE('Nacao ' || v_nacao || ' foi removida da federacao ' || p_federacao);
+            END IF;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Erro: Voce so pode modificar a sua propria nacao.');
+        END IF;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Nacao ou federacao nao encontrada.');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao excluir nação de federaçao: ' || SQLERRM);
+            RAISE;
+    END excluir_nacao_de_federacao;
+
+    PROCEDURE criar_federacao_com_nacao(p_federacao VARCHAR2, p_user_id CHAR, p_nacao VARCHAR2, p_data_fund DATE) IS
+        v_nacao VARCHAR2(15);
+    BEGIN
+        -- Obter a nação do LIDER logado
+        SELECT NACAO INTO v_nacao
+        FROM LIDER
+        WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
+
+        -- Verificar se a nacao e a mesma do lider logado
+        IF v_nacao = p_nacao THEN
+            INSERT INTO FEDERACAO (NOME, DATA_FUND)
+            VALUES (p_federacao, p_data_fund);
+            
+            UPDATE NACAO
+            SET FEDERACAO = p_federacao
+            WHERE NOME = v_nacao;
+            COMMIT;
+            DBMS_OUTPUT.PUT_LINE('Federação ' || p_federacao || ' criada com a nação ' || v_nacao);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Erro: Você só pode criar federação com a sua própria nação.');
+        END IF;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Nacao nao encontrada.');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao criar federacao com nacao: ' || SQLERRM);
+            RAISE;
+    END criar_federacao_com_nacao;
+
+    PROCEDURE inserir_dominancia(p_planeta VARCHAR2, p_nacao VARCHAR2, p_data_ini DATE) IS
+    BEGIN
+        INSERT INTO DOMINANCIA (PLANETA, NACAO, DATA_INI)
+        SELECT p_planeta, p_nacao, p_data_ini
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM DOMINANCIA
+            WHERE PLANETA = p_planeta AND DATA_FIM IS NULL
+        );
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Erro ao inserir dominancia: ' || SQLERRM);
+            RAISE;
+    END inserir_dominancia;
+
+END pkg_comandante;
+
+
+
+
+
 -- Pacote do CIENTISTA --
 
 CREATE OR REPLACE TYPE tp_estrela AS OBJECT (
