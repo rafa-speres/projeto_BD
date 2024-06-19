@@ -351,9 +351,13 @@ def criar_overview_comandante(app, mostrar_tela_inicial, usuario, faccao, mostra
     botao_inserir_dominancia = ctk.CTkButton(frame_overview_comandante, text="Inserir dominancia", command=lambda: inserir_dominancia(usuario, entrada_planeta), width=400, height=40)
     botao_inserir_dominancia.pack(pady=10)
     
+    label_entry_distancia = ctk.CTkLabel(frame_overview_comandante, text="Distancia máxima")
+    label_entry_distancia.pack(pady=5)
+    entry_distancia = ctk.CTkEntry(frame_overview_comandante, width=400)
+    entry_distancia.pack(pady=5)
     
     # Botão para ver relatórios
-    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao[0], tipo_usuario), width=400, height=40)
+    botao_ver_relatorios = ctk.CTkButton(frame_overview_comandante, text="Ver Relatórios", command=lambda: mostrar_relatorio_comandante(usuario, faccao[0], tipo_usuario, entry_distancia.get()), width=400, height=40)
     botao_ver_relatorios.pack(pady=10)
 
     # Botão para voltar à tela de login
