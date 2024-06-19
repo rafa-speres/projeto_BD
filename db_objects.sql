@@ -182,7 +182,7 @@ CREATE OR REPLACE PACKAGE BODY PacoteLiderFaccao AS
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao remover faccao da nacao: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao credenciar comunidade: ' || SQLERRM);
             RAISE;
     END CredenciarComunidadesNovas;
 END PacoteLiderFaccao;
@@ -253,7 +253,7 @@ BEGIN
         
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20002, 'A comunidade não pertence a um planeta possivel.');
+            RAISE_APPLICATION_ERROR(-20002, 'A comunidade nï¿½o pertence a um planeta possivel.');
         WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR(-20001, 'Erro ao inserir dados na tabela PARTICIPA: ' || SQLERRM);
     END;
@@ -265,19 +265,19 @@ END;
 
 -- Pacote do OFICIAL --
 
--- Criando um Tipo para exibir o relatório do OFICIAL
+-- Criando um Tipo para exibir o relatï¿½rio do OFICIAL
 CREATE OR REPLACE TYPE tp_relatorio_oficial AS OBJECT (
-    agrupamento VARCHAR2(100), -- Contém os itens distintos para o agrupamento escolhido.
-    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregação sendo definida.
-    total_habitantes NUMBER, -- Agregado de total de habitantes na determinada comunidade ou na agregação sendo definida.
+    agrupamento VARCHAR2(100), -- Contï¿½m os itens distintos para o agrupamento escolhido.
+    qtd_comunidades NUMBER, -- Quantidade de comunidades contidas na agregaï¿½ï¿½o sendo definida.
+    total_habitantes NUMBER, -- Agregado de total de habitantes na determinada comunidade ou na agregaï¿½ï¿½o sendo definida.
     data_ini DATE, -- Data inicial de HABITACAO da COMUNIDADE
     data_fim DATE -- Data final de HABITACAO da COMUNIDADE ou agrupamento
 );
 
--- Criando um Tipo para a tabela de registros que será utilizada para exibir o relatório do OFICIAL
+-- Criando um Tipo para a tabela de registros que serï¿½ utilizada para exibir o relatï¿½rio do OFICIAL
 CREATE OR REPLACE TYPE tp_relatorio_tabela_oficial AS TABLE OF tp_relatorio_oficial;
 
--- Criação do pacote do OFICIAL
+-- Criaï¿½ï¿½o do pacote do OFICIAL
 CREATE OR REPLACE PACKAGE pkg_oficial AS
     FUNCTION relatorio_oficial(
         p_oficial_id IN CHAR,
@@ -303,7 +303,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_oficial AS
 
         -- Verificando se a NACAO foi encontrada
         IF v_nacao_nome IS NOT NULL THEN
-            -- Caso DEFAULT: informações sobre as comunidades da NACAO do LIDER
+            -- Caso DEFAULT: informaï¿½ï¿½es sobre as comunidades da NACAO do LIDER
             IF p_agrupamento IS NULL THEN
                 FOR rec IN (
                     SELECT 
@@ -439,7 +439,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_comandante AS
         FROM LIDER
         WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
 
-        -- Verificar se a nação inserida e a mesma do lider logado
+        -- Verificar se a naï¿½ï¿½o inserida e a mesma do lider logado
         IF v_nacao = p_nacao THEN
             UPDATE NACAO
             SET FEDERACAO = p_federacao
@@ -451,26 +451,26 @@ CREATE OR REPLACE PACKAGE BODY pkg_comandante AS
                 DBMS_OUTPUT.PUT_LINE('Nacao ' || v_nacao || ' foi incluida na federacao ' || p_federacao);
             END IF;
         ELSE
-            DBMS_OUTPUT.PUT_LINE('Erro: Você só pode modificar a sua propria nação.');
+            DBMS_OUTPUT.PUT_LINE('Erro: Vocï¿½ sï¿½ pode modificar a sua propria naï¿½ï¿½o.');
         END IF;
 
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
             DBMS_OUTPUT.PUT_LINE('Nacao ou federacao nao encontrada.');
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao incluir nação em federacao: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao incluir naï¿½ï¿½o em federacao: ' || SQLERRM);
             RAISE;
     END incluir_nacao_em_federacao;
 
     PROCEDURE excluir_nacao_de_federacao(p_user_id CHAR, p_nacao VARCHAR2, p_federacao VARCHAR2) IS
         v_nacao VARCHAR2(15);
     BEGIN
-        -- Obter a nação do líder logado
+        -- Obter a naï¿½ï¿½o do lï¿½der logado
         SELECT NACAO INTO v_nacao
         FROM LIDER
         WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
 
-        -- Verificar se a nação inserida e a mesma do LIDER logado
+        -- Verificar se a naï¿½ï¿½o inserida e a mesma do LIDER logado
         IF v_nacao = p_nacao THEN
             UPDATE NACAO
             SET FEDERACAO = NULL
@@ -489,14 +489,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_comandante AS
         WHEN NO_DATA_FOUND THEN
             DBMS_OUTPUT.PUT_LINE('Nacao ou federacao nao encontrada.');
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erro ao excluir nação de federaçao: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE('Erro ao excluir naï¿½ï¿½o de federaï¿½ao: ' || SQLERRM);
             RAISE;
     END excluir_nacao_de_federacao;
 
     PROCEDURE criar_federacao_com_nacao(p_federacao VARCHAR2, p_user_id CHAR, p_nacao VARCHAR2, p_data_fund DATE) IS
         v_nacao VARCHAR2(15);
     BEGIN
-        -- Obter a nação do LIDER logado
+        -- Obter a naï¿½ï¿½o do LIDER logado
         SELECT NACAO INTO v_nacao
         FROM LIDER
         WHERE CPI = (SELECT id_lider FROM USERS WHERE id_lider = p_user_id);
@@ -510,9 +510,9 @@ CREATE OR REPLACE PACKAGE BODY pkg_comandante AS
             SET FEDERACAO = p_federacao
             WHERE NOME = v_nacao;
             COMMIT;
-            DBMS_OUTPUT.PUT_LINE('Federação ' || p_federacao || ' criada com a nação ' || v_nacao);
+            DBMS_OUTPUT.PUT_LINE('Federaï¿½ï¿½o ' || p_federacao || ' criada com a naï¿½ï¿½o ' || v_nacao);
         ELSE
-            DBMS_OUTPUT.PUT_LINE('Erro: Você só pode criar federação com a sua própria nação.');
+            DBMS_OUTPUT.PUT_LINE('Erro: Vocï¿½ sï¿½ pode criar federaï¿½ï¿½o com a sua prï¿½pria naï¿½ï¿½o.');
         END IF;
 
     EXCEPTION
@@ -609,7 +609,7 @@ CREATE OR REPLACE PACKAGE PACOTE_CIENTISTA AS
   );
 
 
--- relativo ao relatório
+-- relativo ao relatï¿½rio
   FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED;
   FUNCTION obterPlanetas RETURN tp_tabela_planeta PIPELINED;
   FUNCTION obterSistemas RETURN tp_tabela_sistema PIPELINED;
@@ -716,7 +716,7 @@ CREATE OR REPLACE PACKAGE BODY PACOTE_CIENTISTA AS
     END;
   END deletar_estrela;
 
-  -- Relativo ao relatório -------------------------------------------------------------
+  -- Relativo ao relatï¿½rio -------------------------------------------------------------
 
   FUNCTION obterEstrelas RETURN tp_tabela_estrela PIPELINED AS
   BEGIN
